@@ -17,7 +17,7 @@
     data-zoom="14"
     style="width: 100%; height: 400px;">
   </div>
-  <script type="text/javascript" src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>
+  <script type="text/javascript" src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
 </body>
 </html>
 ```
@@ -58,11 +58,11 @@ markers.geojson:
 
 ```html
 <div id="map" style="width: 100%; height: 500px;"></div>
-<script type="text/javascript" src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script type="text/javascript" src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
 <script>
   const map = new geolonia.Map({
     container: 'map',
-    style: 'geolonia/basic-v1',
+    style: 'geolonia/basic-v2',
     center: [139.7671, 35.6812],
     zoom: 12
   });
@@ -107,12 +107,12 @@ markers.geojson:
 </div>
 <div id="map" style="width: 100%; height: 500px;"></div>
 
-<script type="text/javascript" src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script type="text/javascript" src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
 <script src="https://cdn.geolonia.com/community-geocoder.js"></script>
 <script>
   const map = new geolonia.Map({
     container: 'map',
-    style: 'geolonia/basic-v1',
+    style: 'geolonia/basic-v2',
     center: [139.7671, 35.6812],
     zoom: 12
   });
@@ -152,12 +152,12 @@ markers.geojson:
 <div id="map" style="width: 100%; height: 500px;"></div>
 <div id="result"></div>
 
-<script type="text/javascript" src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script type="text/javascript" src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
 <script src="https://cdn.jsdelivr.net/npm/@geolonia/open-reverse-geocoder@latest/dist/index.js"></script>
 <script>
   const map = new geolonia.Map({
     container: 'map',
-    style: 'geolonia/basic-v1',
+    style: 'geolonia/basic-v2',
     center: [139.7671, 35.6812],
     zoom: 10
   });
@@ -176,7 +176,7 @@ markers.geojson:
 ```javascript
 const map = new geolonia.Map({
   container: 'map',
-  style: 'geolonia/basic-v1',
+  style: 'geolonia/basic-v2',
   center: [139.7671, 35.6812],
   zoom: 10
 });

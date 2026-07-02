@@ -6,8 +6,8 @@
 
 | スタイル名 | 説明 |
 |---|---|
-| `geolonia/basic-v1` | デフォルトのワールドマップスタイル |
-| `geolonia/basic-v2` | 新版のグローバルマップスタイル |
+| `geolonia/basic-v2` | デフォルトのグローバルマップスタイル（現行の既定） |
+| `geolonia/basic-v1` | 初代のワールドマップスタイル |
 | `geolonia/gsi` | 国土地理院データ + OpenStreetMap ベース |
 | `geolonia/midnight` | ダークテーマ |
 
