@@ -14,7 +14,7 @@ const map = new geolonia.Map('#map');
 ```javascript
 const map = new geolonia.Map({
   container: 'map',
-  style: 'geolonia/basic-v1',
+  style: 'geolonia/basic-v2',
   center: [139.7671, 35.6812],
   zoom: 14,
   pitch: 30,
@@ -158,6 +158,6 @@ window.geolonia.registerPlugin(myPlugin);
 プラグインスクリプトは Embed API のスクリプトより後に読み込む:
 
 ```html
-<script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
 <script src="my-plugin.js"></script>
 ```
