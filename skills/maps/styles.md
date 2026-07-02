@@ -8,8 +8,15 @@
 |---|---|
 | `geolonia/basic-v2` | デフォルトのグローバルマップスタイル（現行の既定） |
 | `geolonia/basic-v1` | 初代のワールドマップスタイル |
-| `geolonia/gsi` | 国土地理院データ + OpenStreetMap ベース |
-| `geolonia/midnight` | ダークテーマ |
+| `geolonia/basic` | 基本スタイル（現行 basic 系のエイリアス。現在は basic-v2 相当） |
+| `geolonia/gsi` | 国土地理院データ + OpenStreetMap ベース（GSI Japan） |
+| `geolonia/midnight` | ダークテーマ（Geolonia Midnight） |
+| `geolonia/red-planet` | 赤系のテーマスタイル（Geolonia Red Planet） |
+| `geolonia/notebook` | ノート風のテーマスタイル（Geolonia Notebook） |
+| `geolonia/homework` | 手書き風のテーマスタイル（Geolonia Homework） |
+| `geoloniamaps/smartcity-base` | スマートシティ向けベーススタイル |
+
+namespace に注意する。標準スタイルは `geolonia/` 配下だが、`smartcity-base` のみ `geoloniamaps/` 配下にある。
 
 ### 使用例
 
