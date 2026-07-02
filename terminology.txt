@@ -1,0 +1,16 @@
+Geolonia
+MapLibre
+maplibregl
+Mapbox
+GeoJSON
+PMTiles
+OpenMapTiles
+OpenStreetMap
+GSI
+Geocoder
+geocoder
+geocoding
+fontstack
+glyphs
+midnight
+basic

@@ -7,7 +7,7 @@ Geolonia Maps の Embed API、JavaScript API、ジオコーディング、マッ
 
 ## 構成
 
-```
+```text
 .claude-plugin/
 └── plugin.json                # プラグイン定義（名前・バージョン・著者）
 skills/

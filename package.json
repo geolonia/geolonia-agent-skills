@@ -1,0 +1,23 @@
+{
+  "name": "@geolonia/agent-skills",
+  "version": "1.1.0",
+  "description": "Geolonia Maps を使った地図アプリ開発を支援する Claude Code スキル",
+  "private": true,
+  "license": "MIT",
+  "repository": "https://github.com/geolonia/geolonia-agent-skills",
+  "scripts": {
+    "check": "npm run format:check && npm run spellcheck && npm run lint:markdown && npm run validate:skills",
+    "format:check": "prettier --check \"**/*.{json,yml,yaml}\"",
+    "format": "prettier --write \"**/*.{json,yml,yaml}\"",
+    "spellcheck": "cspell --no-progress \"**/*.md\"",
+    "lint:markdown": "markdownlint-cli2 \"**/*.md\"",
+    "validate:skills": "node scripts/validate-skills.js",
+    "setup": "node scripts/setup-hooks.js",
+    "postinstall": "node scripts/setup-hooks.js"
+  },
+  "devDependencies": {
+    "cspell": "^8.17.0",
+    "markdownlint-cli2": "^0.16.0",
+    "prettier": "^3.4.2"
+  }
+}
