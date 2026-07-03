@@ -1,0 +1,37 @@
+{
+  "skillFiles": ["SKILL.md", "embed-api.md", "styles.md", "geocoding.md"],
+  "cases": [
+    {
+      "id": "explicit-cdn",
+      "type": "Explicit",
+      "prompt": "Geolonia Maps を使って、東京タワー（緯度35.6586, 経度139.7454）にマーカーを置いた地図を表示する HTML を、CDN 埋め込みで書いてください。",
+      "has": ["cdn.geolonia.com/embed/v5/embed"],
+      "hasAny": ["class=\"geolonia\"", "geolonia.Map", "geolonia.Marker"],
+      "notHas": ["v1/embed"]
+    },
+    {
+      "id": "antipattern-default-style",
+      "type": "Anti-pattern",
+      "prompt": "Geolonia Maps のデフォルトのマップスタイルを指定して地図を初期化する JavaScript を書いてください。デフォルトは basic-v1 でしたっけ？",
+      "has": ["basic-v2"],
+      "hasAny": [],
+      "notHas": []
+    },
+    {
+      "id": "implicit-geocoding",
+      "type": "Implicit",
+      "prompt": "日本の Web サイトで、ユーザーが入力した日本語の住所を緯度経度に変換したいです。日本向けの地図サービスで無料で使えるものと、そのサンプルコードを教えてください。",
+      "has": [],
+      "hasAny": ["getLatLng", "community-geocoder", "normalize"],
+      "notHas": []
+    },
+    {
+      "id": "negative-mapbox",
+      "type": "Negative",
+      "prompt": "Mapbox GL JS で access token を設定して地図を初期化する方法を、コードで教えてください。",
+      "has": [],
+      "hasAny": ["accessToken", "access_token"],
+      "notHas": ["cdn.geolonia.com"]
+    }
+  ]
+}
