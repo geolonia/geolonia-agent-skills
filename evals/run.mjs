@@ -25,7 +25,14 @@ const SKILL_DIR = path.join(HERE, '..', 'skills', 'maps');
 const PROVIDER = process.env.EVAL_PROVIDER || 'ollama';
 const MODEL = process.env.EVAL_MODEL || (PROVIDER === 'anthropic' ? 'claude-haiku-4-5-20251001' : 'gpt-oss:20b');
 
+const TIMEOUT_MS = Number(process.env.EVAL_TIMEOUT_MS || 300_000);
+
 const config = JSON.parse(fs.readFileSync(path.join(HERE, 'cases.json'), 'utf8'));
+
+if (PROVIDER === 'anthropic' && !process.env.ANTHROPIC_API_KEY) {
+  console.error('EVAL_PROVIDER=anthropic には ANTHROPIC_API_KEY が必要です。');
+  process.exit(1);
+}
 
 const skillText = config.skillFiles
   .map((f) => `# ===== ${f} =====\n` + fs.readFileSync(path.join(SKILL_DIR, f), 'utf8'))
@@ -50,6 +57,7 @@ async function askOllama(system, prompt) {
       ],
       options: { temperature: 0, num_predict: 900 },
     }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Ollama HTTP ${res.status}. ollama serve が起動しているか確認してください。`);
   const data = await res.json();
@@ -71,6 +79,7 @@ async function askAnthropic(system, prompt) {
       system,
       messages: [{ role: 'user', content: prompt }],
     }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`Anthropic HTTP ${res.status}: ${await res.text()}`);
   const data = await res.json();
