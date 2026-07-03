@@ -19,10 +19,18 @@ if (!fs.existsSync(gitDir) || !fs.existsSync(srcDir)) {
   process.exit(0);
 }
 
-for (const name of fs.readdirSync(srcDir)) {
-  const src = path.join(srcDir, name);
-  const dest = path.join(destDir, name);
-  fs.copyFileSync(src, dest);
-  fs.chmodSync(dest, 0o755);
-  console.log(`hook を導入しました: ${name}`);
+// フック導入は便宜的な機能なので、失敗しても npm install 自体は止めない。
+// git worktree / submodule では .git がファイルで .git/hooks が無いことがあるため、
+// mkdir で補い、それでも失敗したら警告のみ出して継続する。
+try {
+  fs.mkdirSync(destDir, { recursive: true });
+  for (const name of fs.readdirSync(srcDir)) {
+    const src = path.join(srcDir, name);
+    const dest = path.join(destDir, name);
+    fs.copyFileSync(src, dest);
+    fs.chmodSync(dest, 0o755);
+    console.log(`hook を導入しました: ${name}`);
+  }
+} catch (e) {
+  console.warn(`git hook の導入に失敗しました（スキップします）: ${e.message}`);
 }
