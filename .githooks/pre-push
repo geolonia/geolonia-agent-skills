@@ -1,0 +1,8 @@
+#!/bin/sh
+# push 前に CI と同じチェックを実行する。
+# 一時的に回避したい場合は `git push --no-verify`。
+echo "pre-push: npm run check を実行します..."
+npm run check || {
+  echo "pre-push: チェックに失敗しました。修正するか --no-verify で回避してください。" >&2
+  exit 1
+}
