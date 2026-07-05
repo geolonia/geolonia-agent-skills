@@ -1,0 +1,38 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "geolonia-terms",
+      "path": "./terminology.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["geolonia-terms", "software-terms", "companies", "filetypes"],
+  "ignorePaths": ["node_modules/**", "package-lock.json", "tmp/**", "*.json"],
+  "allowCompoundWords": true,
+  "words": [
+    "geolonia",
+    "geoloniamaps",
+    "maplibre",
+    "maplibregl",
+    "geojson",
+    "lnglat",
+    "lngLat",
+    "bearing",
+    "pitch",
+    "geocoder",
+    "geocoding",
+    "reverse",
+    "normalize",
+    "jsdelivr",
+    "unpkg",
+    "pbf",
+    "glyphs",
+    "fontstack",
+    "openmaptiles",
+    "midnight",
+    "gsi",
+    "atts"
+  ]
+}
