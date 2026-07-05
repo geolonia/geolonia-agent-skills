@@ -33,6 +33,10 @@
     "openmaptiles",
     "midnight",
     "gsi",
-    "atts"
+    "atts",
+    "evals",
+    "ollama",
+    "qwen",
+    "promptfoo"
   ]
 }
