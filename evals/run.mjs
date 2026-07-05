@@ -130,9 +130,12 @@ async function main() {
     console.log(`  with-skill: ${fmt(r.skill)}`);
   }
 
-  // with-skill が baseline を下回ったら異常終了（回帰検知）
-  if (s < b) {
-    console.error('\nスキル注入で退行が発生しました。');
+  // ケース単位で baseline:PASS -> with-skill:FAIL の退行を検知する。
+  // 合計 PASS 数の比較だけだと、あるケースの改善が別ケース（例: Negative の
+  // 過剰適用防止）の退行を打ち消して見逃すため、ケース単位で判定する。
+  const regressed = results.filter((r) => r.base.pass && !r.skill.pass);
+  if (regressed.length > 0) {
+    console.error(`\nスキル注入で以下のケースが退行しました: ${regressed.map((r) => r.c.id).join(', ')}`);
     process.exit(1);
   }
 }
