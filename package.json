@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "cspell": "^8.17.0",
-    "markdownlint-cli2": "^0.16.0",
+    "markdownlint-cli2": "^0.23.0",
     "prettier": "^3.4.2"
   }
 }
