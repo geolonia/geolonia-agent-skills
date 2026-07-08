@@ -1,9 +1,11 @@
 ---
 name: maps
 description: >
-  Geolonia Maps を使った地図アプリの開発を支援する。地図の埋め込み、
-  マーカー・ポップアップの追加、GeoJSON データの表示、ジオコーディング、
-  マップスタイルのカスタマイズなど、地図関連の実装時に使用する。
+  Geolonia Maps（MapLibre GL JS ベースの日本向け地図プラットフォーム）を使った
+  地図アプリ開発を支援する。地図の CDN 埋め込み、マーカー・ポップアップの追加、
+  GeoJSON データの表示、住所ジオコーディングと日本語住所正規化、マップスタイルの
+  指定とカスタマイズを行うときに使用する。Geolonia、Geolonia Maps、MapLibre、
+  地図埋め込み、マーカー、GeoJSON、ジオコーディングといったリクエストで呼び出す。
 ---
 
 # Geolonia Maps 開発ガイド
@@ -12,6 +14,21 @@ description: >
 
 Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラットフォーム。
 `maplibregl` の全クラスが `geolonia` 名前空間で利用でき、HTML の data 属性による宣言的な地図埋め込みも可能。
+
+## いつ使うか（When to Use This Skill）
+
+以下のようなリクエストで使用する:
+
+- Geolonia Maps / Geolonia の地図をページに埋め込みたい
+- 地図にマーカー・ポップアップ・GeoJSON レイヤーを表示したい
+- 住所から座標を求めたい（ジオコーディング）、座標から住所を求めたい（逆ジオコーディング）、日本語住所を正規化したい
+- マップスタイルを指定・切り替え・カスタマイズしたい
+- MapLibre GL JS ベースで日本向けの地図機能（GSI スタイル等）を使いたい
+
+次の場合は無理に適用しない:
+
+- Mapbox GL JS や Google Maps など他プロバイダ固有の API に閉じた質問
+- 地図と無関係な一般的な Web 実装
 
 ## セットアップ（CDN）
 
