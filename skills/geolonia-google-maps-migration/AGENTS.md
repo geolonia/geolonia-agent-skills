@@ -35,5 +35,5 @@
   を渡さない（存在しないフィールドなので意味を持たない）。
 - `map._getImpl()` / `map._whenReady()` の存在を隠さない。maps-suite がカバーしていない
   機能は最初からこのエスケープハッチを使う前提で設計する。
-- `tmp/geolonia-maps/sdk/issues/maps-suite/` の既知ギャップを確認せずに「バグかもしれない」
+- `references/known-gaps.md`（[geolonia/maps-suite](https://github.com/geolonia/maps-suite/issues) 側の既知issue）を確認せずに「バグかもしれない」
   挙動を延々自前のコードだけデバッグしない。ライブラリ単体の最小再現 HTML で先に切り分ける。

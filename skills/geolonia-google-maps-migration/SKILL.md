@@ -87,12 +87,12 @@ description: >
 ## 既知のギャップ（未対処・upstream で追跡中）
 
 以下は `@geolonia/maps-suite` 側で対応されるべきギャップとして
-`tmp/geolonia-maps/sdk/issues/maps-suite/` に記録済み。対処されるまでは
-[`references/known-gaps.md`](references/known-gaps.md) の回避策を使うこと。
+[geolonia/maps-suite](https://github.com/geolonia/maps-suite/issues) に issue を起票済み。
+対処されるまでは [`references/known-gaps.md`](references/known-gaps.md) の回避策を使うこと。
 
-- `missing-polyline.md` — Polyline 相当のクラスが存在しない
-- `missing-symbol-path-circle.md` — Marker アイコンがベクター記号（SymbolPath.CIRCLE 等）に対応していない
-- `panto-cancelled-by-setzoom.md` — panTo() 直後の setZoom() がパンをキャンセルしてしまう（互換性バグ、重要度高）
+- [geolonia/maps-suite#71](https://github.com/geolonia/maps-suite/issues/71) — Polyline 相当のクラスが存在しない
+- [geolonia/maps-suite#72](https://github.com/geolonia/maps-suite/issues/72) — Marker アイコンがベクター記号（SymbolPath.CIRCLE 等）に対応していない
+- [geolonia/maps-suite#73](https://github.com/geolonia/maps-suite/issues/73) — panTo() 直後の setZoom() がパンをキャンセルしてしまう（互換性バグ、重要度高）
 
 ## リファレンス
 

@@ -32,6 +32,6 @@ skills/
 - SKILL.md は軽量に保ち、詳細は参照ファイルに分離する
 - Geolonia Maps は MapLibre GL JS の拡張であることを前提とする
 - `@geolonia/maps-suite` の既知の未実装機能・互換性バグは
-  `tmp/geolonia-maps/sdk/issues/maps-suite/`（ワークスペース内、このリポジトリの外）に
-  記録し、upstream で解消されるまで `geolonia-google-maps-migration/references/known-gaps.md`
+  [geolonia/maps-suite](https://github.com/geolonia/maps-suite/issues) 側に issue を起票し、
+  upstream で解消されるまで `geolonia-google-maps-migration/references/known-gaps.md`
   に回避策を明記する
