@@ -35,130 +35,54 @@ description: >
 
 ## 移行手順
 
-### 1. 棚卸し（最初にやる）
-
-対象コードが使っている Google Maps API を洗い出す。特に以下は maps-suite に**存在しない**ため、
-見つかった場合は事前に回避策を検討しておく（詳細: [`references/known-gaps.md`](references/known-gaps.md)）。
-
-- `google.maps.Polyline` / `Polygon` / `Circle`
-- `icon: { path: google.maps.SymbolPath.CIRCLE, ... }` のようなベクター記号アイコン
-- `Geocoder` / `DirectionsService` / `Places` などのサービス系 API
-- `gestureHandling` / `fullscreenControl` / `streetViewControl` / `mapTypeId` などの `MapOptions`
-
-### 2. インストール
-
-```bash
-npm install @geolonia/maps-suite maplibre-gl
-```
-
-`maplibre-gl` は peer dependency なので必ず一緒にインストールする。
-
-### 3. API キーの取得
-
-Geolonia API キーは [app.geolonia.com](https://app.geolonia.com/) のコンソールで発行する
-（組織内に共有のデモキーは存在しない）。環境変数名は `VITE_GOOGLE_MAPS_API_KEY` のような
-既存の命名から `VITE_GEOLONIA_API_KEY` 等へリネームするとよい。
-
-外部の style.json を指定する場合は API キー不要（`geolonia/gsi` 等の組み込みスタイルを使う
-場合は API キーが必要）。
-
-### 4. ローダーの置き換え
-
-```javascript
-// Before
-import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
-setOptions({ key: API_KEY, v: 'weekly' });
-const { Map } = await importLibrary('maps');
-
-// After
-import { geolonia } from '@geolonia/maps-suite';
-// geolonia.maps.Map / Marker / InfoWindow / MarkerClusterer を直接参照できる
-```
-
-`geolonia.maps.importLibrary("maps" | "marker" | "core")` という非同期ローダーも存在するが、
-`InfoWindow` はどのライブラリ名でも返ってこない（`geolonia.maps.InfoWindow` を直接参照する
-必要がある）。混乱を避けるため、このスキルでは `geolonia.maps.*` を直接参照する方法を推奨する。
-
-### 5. 地図の初期化
-
-```javascript
-// Before
-const map = new google.maps.Map(el, { center: { lat, lng }, zoom });
-
-// After
-const map = new geolonia.maps.Map(el, {
-  center: { lat, lng },
-  zoom,
-  style: 'geolonia/gsi', // または 'geolonia/basic-v2' など
-  apiKey: API_KEY,
-});
-```
-
-`gestureHandling` / `fullscreenControl` / `streetViewControl` / `mapTypeId` は `MapOptions`
-に存在しないので削除する。
-
-### 6. マーカー・ポップアップ・クラスタリング
-
-`geolonia.maps.Marker` / `MarkerClusterer` はほぼそのまま移植できる。`InfoWindow` は
-`.open(map, anchor)`（位置引数）であって Google の `.open({ map, anchor })`（オプション
-オブジェクト）ではない点に注意。詳細は [`references/api-differences.md`](references/api-differences.md)。
-
-### 7. ベクター記号アイコン（SymbolPath）
-
-`icon` は `{ url: string }`（画像 URL）のみ対応。色分けした円マーカーなどは実行時に SVG を
-data URI として生成して代替する。実装例は
-[`references/marker-icons.md`](references/marker-icons.md)。
-
-### 8. Polyline / 線・面データ
-
-`Polyline`/`Polygon` 相当のクラスは存在しない。`map._getImpl()`（内部の MapLibre GL JS
-インスタンス）を取得し、`addSource`/`addLayer` で GeoJSON の `line`/`fill` レイヤーとして
-描画する。実装例は [`references/polyline-workaround.md`](references/polyline-workaround.md)。
-
-### 9. パン＋ズームの組み合わせに注意
-
-`map.panTo(latLng)` の直後に `map.setZoom(zoom)` を呼ぶと、**パン先ではなく元の位置の
-ままズームされる**（詳細は [`references/known-gaps.md`](references/known-gaps.md) の
-「panTo() が setZoom() にキャンセルされる」を参照）。1 回の
-`map._getImpl().easeTo({ center: [lng, lat], zoom })` にまとめて回避する。
-
-### 10. ビルド・動作確認
-
-```bash
-npm run build   # エラー・警告なしで通ることを確認
-npm run dev
-```
-
-ブラウザで実際に地図が表示され、マーカー・ポップアップ・クラスタリングが動作するか確認する。
-プレースホルダー/無効な API キーでも `geolonia/gsi` 等のベースタイルは表示される
-（フォントグリフの取得のみ 403 になるが無害）ため、実キーが手元になくても UI ロジックの
-動作確認は可能。ただし本番投入前には実キーでの最終確認が必要。
+1. **棚卸し（最初にやる）**: 対象コードが使っている Google Maps API を洗い出す。
+   `Polyline`/`Polygon`/`Circle`、ベクター記号アイコン（`SymbolPath`）、`Geocoder`/
+   `DirectionsService`/`Places`、`gestureHandling` 等の `MapOptions` は maps-suite に
+   **存在しない**ため、見つかった場合は先に回避策を確認しておく
+   （[`references/known-gaps.md`](references/known-gaps.md)）。
+2. **インストール**: `npm install @geolonia/maps-suite maplibre-gl`
+   （`maplibre-gl` は peer dependency）。
+3. **API キーの取得**: [app.geolonia.com](https://app.geolonia.com/) のコンソールで発行する
+   （組織内に共有のデモキーは無い）。外部の style.json を使う場合は不要。
+4. **ローダーの置き換え**: `@googlemaps/js-api-loader` を
+   `import { geolonia } from '@geolonia/maps-suite'` に置き換える
+   （[`references/api-differences.md`](references/api-differences.md)）。
+5. **地図の初期化**: `new geolonia.maps.Map(el, { center, zoom, style, apiKey })`。
+   `gestureHandling`/`fullscreenControl`/`streetViewControl`/`mapTypeId` は削除する
+   （[`references/api-differences.md`](references/api-differences.md)）。
+6. **マーカー・ポップアップ・クラスタリング**: `geolonia.maps.Marker`/`MarkerClusterer`
+   はほぼそのまま移植できる。`InfoWindow.open()` の引数の形が異なる点に注意
+   （[`references/api-differences.md`](references/api-differences.md)）。
+7. **ベクター記号アイコン（SymbolPath）**: `icon` は `{ url: string }` のみ対応。SVG data URI
+   で代替する（[`references/marker-icons.md`](references/marker-icons.md)）。
+8. **Polyline / 線・面データ**: 相当するクラスが無いため、`map._getImpl()` で取得した
+   MapLibre インスタンスに `addSource`/`addLayer` する。地図の読み込みが完了するまで
+   （`idle` イベント等で判定）は呼び出せない
+   （[`references/polyline-workaround.md`](references/polyline-workaround.md)）。
+9. **パン＋ズームの組み合わせに注意**: `map.panTo()` の直後に `map.setZoom()` を呼ぶと
+   パン先ではなく元の位置のままズームされる（[`references/known-gaps.md`](references/known-gaps.md)）。
+10. **ビルド・動作確認**: `npm run build`/`npm run dev` の後、ブラウザで実際に地図・マーカー・
+    ポップアップ・クラスタリングの動作を確認する。プレースホルダー API キーでもベースタイルは
+    表示される（フォントグリフの取得のみ 403 になるが無害）ため、実キーが無くても UI ロジックの
+    確認は進められる。ただし本番投入前には実キーでの最終確認が必要。
 
 ## 手を動かす前に知っておくべきこと（振り返り）
 
 実際の移行作業（`_poc/google-maps-projects/vanilla` 配下 4 プロジェクト）で得られた教訓。
-最初から知っていれば手戻りが減った点をまとめる。
+詳細は各リファレンスを参照。
 
-- **`@geolonia/maps-suite` は「Google Maps 互換」であって「Google Maps 完全再現」ではない。**
-  `Polyline`/`Polygon`/`Circle`/ベクター記号アイコンが無いことを移行の**最初**に確認しないと、
-  実装を半分終えたところで手戻りが発生する。棚卸し（手順 1）を必ず最初にやる。
-- **`map._getImpl()` / `map._whenReady()` は「内部用」と書かれているが、実行時には普通に
-  呼び出せる**（TypeScript の `private` はコンパイル後には効力を持たない）。maps-suite が
-  カバーしていない機能は、最初からこの内部インスタンスへのエスケープハッチを使う前提で
-  設計した方が早い。「公式 API を探す→無くて詰まる→ `_getImpl()` に辿り着く」という遠回りを
-  しなくて済む。
-- **`panTo()` + `setZoom()` の組み合わせは、Google Maps では問題なく動くが maps-suite では
-  壊れる。** この不具合は表面上「パンしたのにマーカーが画面外に消えた」としか見えず、
-  原因究明に時間がかかった（実際に MapLibre の `jumpTo()` が進行中の `easeTo()` を
-  キャンセルすることが原因だと突き止めるまで、単体の再現用 HTML を書いて切り分けが必要
-  だった）。**Google Maps のコードに `panTo` の直後の `setZoom` が出てきたら、最初から
-  1 回の `easeTo({ center, zoom })` に書き換える前提で進める。**
-- **組織内に共有のデモ用 Geolonia API キーは存在しない。** 実キーが必要な場面
-  （タイル・グリフの完全な表示確認）と、プレースホルダーキーで十分な場面（UI ロジックの
-  動作確認）を区別しておくと、キー発行待ちで作業を止めずに済む。
-- **ライブラリ由来のバグかどうか疑わしい挙動に遭遇したら、アプリのコードから切り離した
-  最小の再現用 HTML（`dist/maps-suite.js` の IIFE バンドル + 簡単な `http-server`）を先に
-  書いて確認する。** アプリ側のコードを疑って延々とデバッグするより早く原因を特定できる。
+- `@geolonia/maps-suite` は「Google Maps 互換」であって「完全再現」ではない。棚卸し
+  （手順 1）を省略すると実装途中で手戻りが発生する。
+- `map._getImpl()`/`map._whenReady()` は「内部用」と書かれているが実行時には普通に呼び出せる。
+  maps-suite がカバーしていない機能は最初からこのエスケープハッチを使う前提で設計した方が早い。
+- `panTo()` + `setZoom()` の組み合わせは Google Maps では動くが maps-suite では壊れる
+  （詳細: [`references/known-gaps.md`](references/known-gaps.md)）。この不具合は原因が
+  非自明で、単体の再現用 HTML を書いて初めて切り分けられた。
+- 組織内に共有のデモ用 Geolonia API キーは無い。実キーが必要な場面とプレースホルダーで
+  十分な場面を区別すると、キー発行待ちで作業を止めずに済む。
+- ライブラリ由来のバグか疑わしい挙動に遭遇したら、アプリのコードから切り離した最小の
+  再現用 HTML（`dist/maps-suite.js` の IIFE バンドル + 簡単な `http-server`）を先に書いて
+  確認する方が早い。
 
 ## 既知のギャップ（未対処・upstream で追跡中）
 

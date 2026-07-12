@@ -5,9 +5,17 @@
 
 ## モジュールの取得方法
 
+```js
+// Before（Google Maps）
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+setOptions({ key: API_KEY, v: 'weekly' });
+const { Map } = await importLibrary('maps');
+```
+
 `@geolonia/maps-suite` の npm パッケージは名前付きエクスポートが `geolonia` ひとつだけ。
 
 ```js
+// After（@geolonia/maps-suite）
 import { geolonia } from '@geolonia/maps-suite';
 
 // geolonia.maps.Map / Marker / InfoWindow / MarkerClusterer / AdvancedMarkerElement /
@@ -31,16 +39,27 @@ import { geolonia } from '@geolonia/maps-suite';
 ## `Map` コンストラクタ
 
 ```js
-// Google Maps: 文字列 ID でも HTMLElement でも動く実装が多い
-const map = new google.maps.Map(document.getElementById('map'), opts);
+// Before（Google Maps）
+const map = new google.maps.Map(document.getElementById('map'), {
+  center: { lat, lng },
+  zoom,
+});
 
-// maps-suite: 第一引数は必ず HTMLElement。文字列を渡すと例外
-const map = new geolonia.maps.Map(document.getElementById('map'), opts);
+// After（@geolonia/maps-suite）
+const map = new geolonia.maps.Map(document.getElementById('map'), {
+  center: { lat, lng },
+  zoom,
+  style: 'geolonia/gsi', // または 'geolonia/basic-v2' など
+  apiKey: API_KEY,
+});
 ```
 
+第一引数は必ず `HTMLElement`。文字列 ID を渡すと例外になる。
+
 `MapOptions` は `center` / `zoom` / `style` / `apiKey` のみ。Google Maps の
-`gestureHandling` / `fullscreenControl` / `streetViewControl` / `mapTypeId` は存在しない
-（型に無いので渡しても無視される）。
+`gestureHandling` / `fullscreenControl` / `streetViewControl` / `mapTypeId` は型に存在しない
+ため、TypeScript ではコンパイルエラーになる（削除が必要）。JavaScript から渡した場合に実際
+どう扱われるか（単に無視される等）はバージョン依存で保証されないため、いずれにせよ削除すること。
 
 ## `InfoWindow.open()` の引数
 
