@@ -37,6 +37,10 @@
     "evals",
     "ollama",
     "qwen",
-    "promptfoo"
+    "promptfoo",
+    "Clusterer",
+    "clusterer",
+    "markerclusterer",
+    "googlemaps"
   ]
 }

@@ -11,17 +11,27 @@ Geolonia Maps の Embed API、JavaScript API、ジオコーディング、マッ
 .claude-plugin/
 └── plugin.json                # プラグイン定義（名前・バージョン・著者）
 skills/
-└── maps/
-    ├── SKILL.md               # メインスキル定義（自動呼び出し条件 + 基本原則）
-    ├── embed-api.md           # Embed API リファレンス（data-* 属性一覧）
-    ├── javascript-api.md      # JavaScript API リファレンス
-    ├── geocoding.md           # ジオコーディング（住所↔座標変換・住所正規化）
-    ├── styles.md              # マップスタイル一覧とカスタマイズ
-    └── examples.md            # よくあるパターンのコード例
+├── maps/
+│   ├── SKILL.md               # メインスキル定義（自動呼び出し条件 + 基本原則）
+│   ├── embed-api.md           # Embed API リファレンス（data-* 属性一覧）
+│   ├── javascript-api.md      # JavaScript API リファレンス
+│   ├── geocoding.md           # ジオコーディング（住所↔座標変換・住所正規化）
+│   ├── styles.md              # マップスタイル一覧とカスタマイズ
+│   └── examples.md            # よくあるパターンのコード例
+└── geolonia-google-maps-migration/
+    ├── SKILL.md               # Google Maps → @geolonia/maps-suite 移行手順 + 振り返り
+    ├── AGENTS.md              # 凝縮版クイックリファレンス
+    └── references/            # 既知のギャップ・API差異・回避策の実装例
 ```
 
 ## 方針
 
-- セットアップは CDN 埋め込みに統一（npm install は使わない）
+- セットアップは CDN 埋め込みに統一（npm install は使わない）。ただし
+  `geolonia-google-maps-migration` は `@geolonia/maps-suite` の npm パッケージ利用が前提
+  （Google Maps からの移行元コードが npm ベースであることが多いため）
 - SKILL.md は軽量に保ち、詳細は参照ファイルに分離する
 - Geolonia Maps は MapLibre GL JS の拡張であることを前提とする
+- `@geolonia/maps-suite` の既知の未実装機能・互換性バグは
+  [geolonia/maps-suite](https://github.com/geolonia/maps-suite/issues) 側に issue を起票し、
+  upstream で解消されるまで `geolonia-google-maps-migration/references/known-gaps.md`
+  に回避策を明記する
