@@ -1,64 +1,90 @@
-# 既知のギャップ（@geolonia/maps-suite v1.0.1 時点）
+# 既知のギャップ（@geolonia/maps-suite v1.1.0 時点）
 
-いずれも upstream（[geolonia/maps-suite](https://github.com/geolonia/maps-suite)）に issue
-として起票済み。対処されるまではここに書く回避策を使うこと。upstream で修正されたら該当 issue
-の状態と、このリファレンスの記述を更新すること。
+`@geolonia/maps-suite` 側で対処されるまでは、ここに書く回避策を使う。新しいバージョンが
+リリースされたら、対象バージョンの型定義と実装を確認してこのリファレンスを更新すること。
 
-## 1. Polyline / Polygon / Circle が存在しない
+## v1.1.0 で解消されたギャップ
 
-`geolonia.maps.Polyline` は無い。`geolonia.maps.importLibrary("marker")` が返すのも
-`{ Marker, AdvancedMarkerElement, MarkerClusterer }` のみで `Polyline` は含まれない。
+v1.0.1 時点で回避策が必須だった以下は、**v1.1.0 では公式 API がある**。古い回避策
+（`_getImpl()` + `addSource`/`addLayer` で線を引く、SVG data URI で丸マーカーを作る、
+`easeTo` に手でまとめる）を新規コードに書かないこと。
 
-→ 実装例: [`polyline-workaround.md`](polyline-workaround.md)
-→ 追跡: [geolonia/maps-suite#71](https://github.com/geolonia/maps-suite/issues/71)
+| 内容                                          | 状態                    | 対応する API                                            |
+| --------------------------------------------- | ----------------------- | -------------------------------------------------------- |
+| `Polyline` が無い           | v1.1.0 で追加           | `geolonia.maps.Polyline`                                  |
+| `Polygon` が無い            | v1.1.0 で追加           | `geolonia.maps.Polygon`（穴あきポリゴン対応）             |
+| `Rectangle` が無い          | v1.1.0 で追加           | `geolonia.maps.Rectangle`                                 |
+| `Circle` が無い             | v1.1.0 で追加           | `geolonia.maps.Circle`（`radius` はメートル）             |
+| ベクター記号アイコンが無い  | v1.1.0 で追加           | `icon: { path: SymbolPath.CIRCLE, ... }`                  |
+| `panTo()` + `setZoom()` が壊れる | v1.1.0 で修正      | 同一マイクロタスク内の変更は 1 回の `easeTo`/`jumpTo` に集約される |
+| `importLibrary("maps")` が `InfoWindow` を返さない | v1.1.0 で修正 | `importLibrary("maps")` が図形クラスと `InfoWindow` を含む |
+| `Point` / `Size` が無い | v1.1.0 で追加 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
+| カメラ操作 API の不足     | v1.1.0 で追加           | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
 
-## 2. Marker アイコンがベクター記号（SymbolPath）に対応していない
+### `panTo()` + `setZoom()` が直った仕組み（と残る注意点）
 
-`MarkerOptions.icon` の型は `{ url: string } | null` のみ。Google Maps の
-`{ path: google.maps.SymbolPath.CIRCLE, scale, fillColor, fillOpacity, strokeColor, strokeWeight }`
-のようなベクター記号は渡せない。
-
-→ 実装例: [`marker-icons.md`](marker-icons.md)
-→ 追跡: [geolonia/maps-suite#72](https://github.com/geolonia/maps-suite/issues/72)
-
-## 3. panTo() 直後の setZoom() がパンをキャンセルする（重要度: 高）
-
-```js
-map.panTo({ lat, lng }); // アニメーションでパン開始
-map.setZoom(15);          // 直後に呼ぶと…
-// 期待: パン先を中心に zoom 15
-// 実際: 元の中心付近のまま zoom 15 になる
-```
-
-**原因**: `Map.setZoom()` は内部で MapLibre の `jumpTo()` を呼ぶ。`jumpTo()` は仕様として
-呼び出し時に進行中のアニメーション（`panTo()` が使う `easeTo()`）を `stop()` で即座に
-中断する。`panTo()`/`setZoom()` はどちらも `Map` 内部の同じ `_ready` Promise に
-`.then()` でぶら下がっているため、ほぼ同一マイクロタスクで連続実行され、後から呼ばれた
-（あるいは `jumpTo()` が同期発火する `moveend` で `_center` キャッシュが巻き戻る）方が
-先勝ちしてしまう。呼び出し順序を入れ替えても同様に壊れる。
-
-Google Maps では同じ書き方が問題なく動くため、maps-suite が「コード変更なしで移行できる」
-ことを目的とする以上、これは**互換性バグ**として扱う（MapLibre 自体の不具合ではない）。
-
-**回避策**: 公開 API（`panTo`/`setZoom`）を使わず、`map._getImpl()` で取得した生の
-MapLibre インスタンスに対して 1 回の `easeTo` にまとめる。
+`Map` は `setCenter`/`panTo`/`setZoom`/`setTilt`/`setHeading`/`moveCamera` の呼び出しを
+いったん内部バッファに溜め、マイクロタスクで 1 回だけ MapLibre に反映する
+（2 つ以上変わっていれば `easeTo()`/`jumpTo()` にまとめ、1 つだけなら従来通り個別に呼ぶ）。
+そのため Google Maps と同じ書き方が動く。
 
 ```js
-function panToAndZoom(map, latLng, zoom) {
-  const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
-  const lng = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
-  map._getImpl().easeTo({ center: [lng, lat], zoom });
-}
+map.panTo({ lat, lng });
+map.setZoom(15); // 同期的に続けて呼べば 1 回の easeTo({ center, zoom }) になる
 ```
 
-`latLng` は `{lat, lng}` の literal（数値プロパティ）と `LatLng` インスタンス
-（`marker.getPosition()` が返す、`lat()`/`lng()` メソッド）の両方を受け付けられるようにしておく。
+ただし**まとまるのは「同じ同期処理の中で呼んだ場合」だけ**。`await` や `setTimeout` を
+挟んで別タスクから `setZoom()` を呼ぶと、進行中の `panTo()` アニメーションを
+MapLibre 側が中断するため、途中まで動いた位置でズームされる。パンとズームを続けて
+行いたい場合は同じ関数の中で連続して呼ぶか、`moveCamera({ center, zoom })` を使う
+（`moveCamera` はアニメーション無しの即時反映）。
 
-→ 追跡: [geolonia/maps-suite#73](https://github.com/geolonia/maps-suite/issues/73)
+## 残っているギャップ
+
+### 1. 図形クラス（Polyline / Polygon / Rectangle / Circle）にクリックイベントが無い
+
+`polygon.addListener("click", handler)` は Google Maps では動くが、maps-suite の図形クラスは
+`click` を発火しない（`MVCObject` 由来のプロパティ変更通知は届く）。図形が持つ MapLibre の
+レイヤー ID は private なので、公開 API からクリック判定を付ける手段が無い。
+
+→ クリック可能な図形が必要な場合の実装例: [`shapes.md`](shapes.md#クリックイベントが必要な場合)
+
+### 2. 図形・マーカーのオプションが最小セットしかない
+
+| クラス                                  | 使えるオプション                                                          | 未対応                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `Polyline`                              | `path` / `map` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` | `icons`（矢印等）/ `geodesic` / `zIndex` / `editable` / `draggable` / `clickable` |
+| `Polygon` / `Rectangle` / `Circle`      | 上記 + `fillColor` / `fillOpacity`（`Polygon` は `paths`、`Rectangle` は `bounds`、`Circle` は `center`/`radius`） | 同上                                                       |
+| `Marker`                                | `position` / `map` / `title` / `icon`                                       | `draggable` / `label` / `zIndex` / `animation` / `opacity` / `anchorPoint` |
+| `InfoWindow`                            | `content`                                                                   | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
+
+編集可能な図形（`editable: true` で頂点をドラッグ）は maps-suite の範囲外。
+`map._getImpl()` で取得した MapLibre インスタンスに描画プラグインを組み合わせる。
+
+### 3. `MapOptions` に無いフィールド
+
+使えるのは `center` / `zoom` / `tilt` / `heading` / `style` / `apiKey` / `threeDimensional` /
+`disableDefaultUI` のみ。Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` /
+`maxZoom` / `restriction` / コントロール個別指定（`zoomControl` 等）は型に存在しない。
+既定 UI は `disableDefaultUI: true` による一括非表示のみで、個別の出し分けはできない
+（必要なら `map._getImpl()` に対して MapLibre のコントロールを自前で足す）。
+
+### 4. サービス系 API（Geocoder / Directions / Places）が未実装
+
+`importLibrary("places")` / `("geometry")` / `("drawing")` / `("visualization")` は
+名前としては認識されるが、`console.warn` を出して**空オブジェクトを返す**。
+`const { PlacesService } = await importLibrary("places")` のように書くと `undefined` が
+返ってきて、実行時に初めて壊れる。移行前の棚卸しで必ず洗い出すこと。
+
+住所から座標を引く用途であれば、Geolonia の
+[community-geocoder](https://github.com/geolonia/community-geocoder) や
+[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)
+を別途組み合わせる（[`geolonia-map`](../../maps/SKILL.md) スキルの `geocoding.md` を参照）。
 
 ## デバッグ時の切り分け方
 
 アプリのコードが悪いのか、ライブラリ側の挙動なのか判断がつかない場合は、
-`node_modules/@geolonia/maps-suite/dist/maps-suite.js`（IIFE バンドル）を単体の HTML から
-読み込む最小の再現ページを作り、アプリのコードを介さずに再現するかどうかを先に確認する。
-アプリ側のロジックを疑って延々デバッグするより早く原因を切り分けられる。
+`node_modules/@geolonia/maps-suite/dist/maps-suite.js`（IIFE バンドル。グローバルは
+`GeoloniaMapsSuite`）を単体の HTML から読み込む最小の再現ページを作り、アプリのコードを
+介さずに再現するかどうかを先に確認する。アプリ側のロジックを疑って延々デバッグするより
+早く原因を切り分けられる。

@@ -31,7 +31,8 @@ skills/
   （Google Maps からの移行元コードが npm ベースであることが多いため）
 - SKILL.md は軽量に保ち、詳細は参照ファイルに分離する
 - Geolonia Maps は MapLibre GL JS の拡張であることを前提とする
-- `@geolonia/maps-suite` の既知の未実装機能・互換性バグは
-  [geolonia/maps-suite](https://github.com/geolonia/maps-suite/issues) 側に issue を起票し、
-  upstream で解消されるまで `geolonia-google-maps-migration/references/known-gaps.md`
-  に回避策を明記する
+- `@geolonia/maps-suite` の既知の未実装機能・互換性バグはライブラリ側の課題管理で追跡し、
+  解消されるまで `geolonia-google-maps-migration/references/known-gaps.md` に回避策を明記する。
+  **このリポジトリは public なので、非公開リポジトリの issue 番号・URL・内部パスは書かない**
+- `@geolonia/maps-suite` はリリースごとに Google Maps 互換の範囲が広がる。
+  バージョンが上がったら移行スキルの記述と回避策を追随させる（対象バージョンを明記する）

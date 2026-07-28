@@ -1,9 +1,14 @@
-# ベクター記号アイコン（SymbolPath.CIRCLE 等）の代替実装
+# マーカーアイコン（SymbolPath / 画像 URL）
 
-## Before（Google Maps）
+v1.1.0 で `MarkerOptions.icon` がベクター記号（`SymbolPath`）に対応した。Google Maps の
+`icon` 指定は**ほぼそのまま移植できる**。v1.0.1 向けの「SVG data URI を自前で組み立てる」
+回避策は新規コードには不要。
+
+## そのまま移植できるもの
 
 ```js
-const marker = new google.maps.Marker({
+// Before（Google Maps）
+new google.maps.Marker({
   position: { lat, lng },
   map,
   icon: {
@@ -15,43 +20,80 @@ const marker = new google.maps.Marker({
     strokeWeight: 2,
   },
 });
-```
 
-## After（@geolonia/maps-suite）
-
-`MarkerOptions.icon` は `{ url: string }`（画像 URL）のみ対応（詳細は
-[`known-gaps.md`](known-gaps.md)）。実行時に SVG を data URI として生成して渡す。
-
-```js
-/** 塗りつぶし円のマーカーアイコンを SVG data URI として生成する。 */
-function circleMarkerIconUrl(fillColor, strokeColor = '#ffffff', radiusPx = 8) {
-  const size = (radiusPx + 2) * 2;
-  const center = size / 2;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><circle cx="${center}" cy="${center}" r="${radiusPx}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/></svg>`;
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-const marker = new geolonia.maps.Marker({
+// After（@geolonia/maps-suite）
+new geolonia.maps.Marker({
   position: { lat, lng },
   map,
-  icon: { url: circleMarkerIconUrl('#1a73e8') },
+  icon: {
+    path: geolonia.maps.SymbolPath.CIRCLE,
+    scale: 8,
+    fillColor: '#1a73e8',
+    fillOpacity: 1,
+    strokeColor: '#ffffff',
+    strokeWeight: 2,
+  },
 });
 ```
 
-## ステータス変化に応じてアイコンを更新する
+`icon` に渡せる型は `{ url: string }`（画像）または `Symbol`（ベクター記号）。
+`Symbol` のフィールドは `path` / `fillColor` / `fillOpacity` / `strokeColor` /
+`strokeOpacity` / `strokeWeight` / `scale` / `rotation`。
 
-`marker.setIcon({ url: ... })` で再生成した data URI に差し替えれば、Google Maps の
-`marker.setIcon(newIcon)` と同じ感覚で使える。
+`SymbolPath` の定数は `CIRCLE` / `FORWARD_CLOSED_ARROW` / `FORWARD_OPEN_ARROW` /
+`BACKWARD_CLOSED_ARROW` / `BACKWARD_OPEN_ARROW` の 5 つで、Google Maps と同じ顔ぶれ。
+`path` には SVG のパス記法の文字列も渡せるので、独自形状もそのまま移植できる。
 
 ```js
-function syncIcon(marker, status, colorMap) {
-  marker.setIcon({ url: circleMarkerIconUrl(colorMap[status]) });
+icon: {
+  path: 'M 0 -1 L 1 1 L -1 1 Z', // SVG パス記法
+  scale: 10,
+  fillColor: '#e53935',
+  fillOpacity: 1,
 }
 ```
 
-## 注意点
+`scale` はパス座標に乗じてピクセルサイズを決める。Google Maps の `scale` と考え方は同じだが
+描画結果が 1 px 単位まで一致する保証は無いので、見た目は実際に確認して調整する。
 
-- `radiusPx` はマーカー画像のピクセルサイズに直結する。Google Maps の `scale` と完全に
-  同じ見た目にはならないので、実装時に見た目を確認しながら調整する。
-- 多数のマーカーで異なる色を使う場合、同じ色の組み合わせは同じ data URI 文字列になるため
-  ブラウザの画像キャッシュが効く。色の種類が多い場合でも実用上の性能問題は出にくい。
+## ステータスに応じてアイコンを更新する
+
+`marker.setIcon(icon)` は Google Maps と同じ感覚で使える（`null` を渡すと既定のマーカーに戻る）。
+
+```js
+function syncIcon(marker, status, colorMap) {
+  marker.setIcon({
+    path: geolonia.maps.SymbolPath.CIRCLE,
+    scale: 8,
+    fillColor: colorMap[status],
+    fillOpacity: 1,
+    strokeColor: '#ffffff',
+    strokeWeight: 2,
+  });
+}
+```
+
+## 画像アイコン（`{ url }`）を使う場合
+
+写真やブランドロゴなど、ベクター記号で表現できないアイコンは従来通り `{ url: '...' }`。
+SVG を data URI にして渡す書き方も引き続き有効で、`Symbol` では表現しきれない
+（複数パス・グラデーション・テキスト入りなど）アイコンではこちらを使う。
+
+```js
+function badgeIconUrl(label, fillColor) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="14" fill="${fillColor}"/><text x="16" y="21" font-size="14" text-anchor="middle" fill="#fff">${label}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+new geolonia.maps.Marker({ position, map, icon: { url: badgeIconUrl('3', '#1a73e8') } });
+```
+
+同じ内容の data URI は同じ文字列になるためブラウザの画像キャッシュが効く。色や数字の
+バリエーションが多くても実用上の性能問題は出にくい。
+
+## 未対応のオプション
+
+`MarkerOptions` は `position` / `map` / `title` / `icon` のみ。`draggable` / `label` /
+`zIndex` / `animation` / `opacity` は無い（[`known-gaps.md`](known-gaps.md) の残ギャップ 2）。
+`label` 相当の表示が必要なら上記の data URI にテキストを埋め込むか、
+`AdvancedMarkerElement` で任意の DOM を置く。
