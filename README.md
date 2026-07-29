@@ -97,8 +97,8 @@ skills/
     └── references/
         ├── known-gaps.md      # maps-suite に無い機能と回避策
         ├── api-differences.md # 細部が異なる API（InfoWindow.open() など）
-        ├── marker-icons.md    # ベクター記号アイコンの SVG 代替実装
-        └── polyline-workaround.md # Polyline/Polygon の GeoJSON レイヤー代替実装
+        ├── marker-icons.md    # マーカーアイコン（SymbolPath / 画像 URL）
+        └── shapes.md          # 図形（Polyline/Polygon/Rectangle/Circle）の移行
 ```
 
 ## ライセンス
