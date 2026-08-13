@@ -25,7 +25,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### 位置・表示
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-lat` | 緯度 | - |
 | `data-lng` | 経度 | - |
 | `data-zoom` | ズームレベル（0〜22） | - |
@@ -38,7 +38,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### スタイル
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-style` | マップスタイル名または style.json の URL | `geolonia/basic-v2` |
 | `data-lang` | 地図の言語（`auto`, `ja`, `en`） | `auto` |
 | `data-3d` | 3D ビル表示 | `off` |
@@ -46,7 +46,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### マーカー
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-marker` | マーカー表示（`on` / `off`） | `on` |
 | `data-marker-color` | マーカーの色（CSS カラー値） | `#E4402F` |
 | `data-open-popup` | 初期表示でポップアップを開く（`on` / `off`） | `off` |
@@ -56,7 +56,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### GeoJSON
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-geojson` | GeoJSON ファイルの URL | - |
 | `data-cluster` | クラスタリング有効化 | `on` |
 | `data-cluster-color` | クラスターの円の色 | - |
@@ -64,7 +64,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### UI コントロール
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-navigation-control` | ナビゲーションコントロールの位置（`top-right`, `top-left`, `bottom-right`, `bottom-left`, `off`） | - |
 | `data-geolocate-control` | 現在地取得コントロールの位置、または `off` | - |
 | `data-fullscreen-control` | フルスクリーンコントロールの位置、または `off` | - |
@@ -74,7 +74,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ### その他
 
 | 属性 | 説明 | デフォルト |
-|---|---|---|
+| --- | --- | --- |
 | `data-key` | API キー（script URL で指定する代わり） | - |
 | `data-loader` | ローディングアニメーション | `on` |
 | `data-lazy-loading` | 遅延読み込み | `on` |

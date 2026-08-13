@@ -28,12 +28,12 @@ import { geolonia } from '@geolonia/maps-suite';
 `geolonia.maps.importLibrary(name)` という非同期ローダーもある。v1.1.0 で返す内容が増え、
 Google Maps の分類に近づいた。
 
-| 名前                                                | 返すもの                                                                     |
+| 名前 | 返すもの |
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `"maps"`                                            | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow` |
-| `"marker"`                                          | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer`                           |
-| `"core"`                                            | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event`                |
-| `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い）           |
+| `"maps"` | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow` |
+| `"marker"` | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer` |
+| `"core"` | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event` |
+| `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い） |
 
 v1.0.1 で `InfoWindow` がどのライブラリ名でも返らなかった問題は解消済みで、
 `importLibrary("maps")` から取れる。ただし `"places"` 等は空オブジェクトを返すため、
@@ -61,16 +61,16 @@ const map = new geolonia.maps.Map(document.getElementById('map'), {
 
 `MapOptions` で使えるのは以下だけ。
 
-| フィールド          | 既定値            | 備考                                                                     |
+| フィールド | 既定値 | 備考 |
 | ------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `center`            | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる（v1.1.0 で既定値が変わった）               |
-| `zoom`              | `0`               | 同上                                                                     |
-| `tilt`              | `0`               | MapLibre の pitch にマッピングされる                                     |
-| `heading`           | `0`               | MapLibre の bearing にマッピングされる                                   |
-| `style`             | maps-core の既定  | Geolonia のスタイル識別子またはスタイル URL                              |
-| `apiKey`            | なし              | `<script src="...?key=XXX">` からの自動取得にも対応                      |
-| `threeDimensional`  | `true`            | **3D 建物が既定で有効**。切るなら `false` を明示する                     |
-| `disableDefaultUI`  | `false`           | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
+| `center` | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる（v1.1.0 で既定値が変わった） |
+| `zoom` | `0` | 同上 |
+| `tilt` | `0` | MapLibre の pitch にマッピングされる |
+| `heading` | `0` | MapLibre の bearing にマッピングされる |
+| `style` | maps-core の既定 | Geolonia のスタイル識別子またはスタイル URL |
+| `apiKey` | なし | `<script src="...?key=XXX">` からの自動取得にも対応 |
+| `threeDimensional` | `true` | **3D 建物が既定で有効**。切るなら `false` を明示する |
+| `disableDefaultUI` | `false` | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
 
 Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` / `restriction` /
 コントロール個別指定（`zoomControl` など）は型に存在しないため、TypeScript ではコンパイル

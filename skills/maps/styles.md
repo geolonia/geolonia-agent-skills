@@ -5,7 +5,7 @@
 `data-style` 属性または `geolonia.Map` の `style` オプションで指定する。
 
 | スタイル名 | 説明 |
-|---|---|
+| --- | --- |
 | `geolonia/basic-v2` | デフォルトのグローバルマップスタイル（現行の既定） |
 | `geolonia/basic-v1` | 初代のワールドマップスタイル |
 | `geolonia/basic` | 基本スタイル（現行 basic 系のエイリアス。現在は basic-v2 相当） |

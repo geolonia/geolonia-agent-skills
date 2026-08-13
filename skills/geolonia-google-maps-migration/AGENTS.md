@@ -19,18 +19,18 @@
 
 ## 対応表（詳細は references/api-differences.md）
 
-| Google Maps                              | @geolonia/maps-suite                                                                     |
+| Google Maps | @geolonia/maps-suite |
 | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `new google.maps.Map(el, opts)`          | `new geolonia.maps.Map(el, { ...opts, style, apiKey })`                                    |
-| `new google.maps.Marker(opts)`           | `new geolonia.maps.Marker(opts)`（ほぼ同じ）                                               |
-| `icon: { path: SymbolPath.CIRCLE, ... }` | 同じ書き方でよい（`geolonia.maps.SymbolPath`）                                             |
-| `new google.maps.InfoWindow(opts)`       | `new geolonia.maps.InfoWindow(opts)`（`content` のみ）                                     |
-| `infoWindow.open({ map, anchor })`       | `infoWindow.open(map, anchor)`（**位置引数**）                                             |
-| `new MarkerClusterer({ map, markers })`  | `new geolonia.maps.MarkerClusterer({ map, markers })`                                      |
-| `new google.maps.Polyline(...)`          | `new geolonia.maps.Polyline(...)`（Polygon / Rectangle / Circle も同様）                   |
-| `polygon.addListener('click', ...)`      | **発火しない**。`map._getImpl()` で自前レイヤーを描いて `impl.on('click', layerId, ...)`   |
-| `map.moveCamera({...})` / `setHeading()` | 同名で使える（`setTilt()` も）                                                             |
-| `new google.maps.Geocoder()` など        | **存在しない**。community-geocoder 等を別途組み合わせる                                    |
+| `new google.maps.Map(el, opts)` | `new geolonia.maps.Map(el, { ...opts, style, apiKey })` |
+| `new google.maps.Marker(opts)` | `new geolonia.maps.Marker(opts)`（ほぼ同じ） |
+| `icon: { path: SymbolPath.CIRCLE, ... }` | 同じ書き方でよい（`geolonia.maps.SymbolPath`） |
+| `new google.maps.InfoWindow(opts)` | `new geolonia.maps.InfoWindow(opts)`（`content` のみ） |
+| `infoWindow.open({ map, anchor })` | `infoWindow.open(map, anchor)`（**位置引数**） |
+| `new MarkerClusterer({ map, markers })` | `new geolonia.maps.MarkerClusterer({ map, markers })` |
+| `new google.maps.Polyline(...)` | `new geolonia.maps.Polyline(...)`（Polygon / Rectangle / Circle も同様） |
+| `polygon.addListener('click', ...)` | **発火しない**。`map._getImpl()` で自前レイヤーを描いて `impl.on('click', layerId, ...)` |
+| `map.moveCamera({...})` / `setHeading()` | 同名で使える（`setTilt()` も） |
+| `new google.maps.Geocoder()` など | **存在しない**。community-geocoder 等を別途組み合わせる |
 
 ## Do not（やってはいけない）
 

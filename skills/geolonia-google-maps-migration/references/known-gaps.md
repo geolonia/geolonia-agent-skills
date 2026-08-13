@@ -9,17 +9,17 @@ v1.0.1 時点で回避策が必須だった以下は、**v1.1.0 では公式 API
 （`_getImpl()` + `addSource`/`addLayer` で線を引く、SVG data URI で丸マーカーを作る、
 `easeTo` に手でまとめる）を新規コードに書かないこと。
 
-| 内容                                          | 状態                    | 対応する API                                            |
+| 内容 | 状態 | 対応する API |
 | --------------------------------------------- | ----------------------- | -------------------------------------------------------- |
-| `Polyline` が無い           | v1.1.0 で追加           | `geolonia.maps.Polyline`                                  |
-| `Polygon` が無い            | v1.1.0 で追加           | `geolonia.maps.Polygon`（穴あきポリゴン対応）             |
-| `Rectangle` が無い          | v1.1.0 で追加           | `geolonia.maps.Rectangle`                                 |
-| `Circle` が無い             | v1.1.0 で追加           | `geolonia.maps.Circle`（`radius` はメートル）             |
-| ベクター記号アイコンが無い  | v1.1.0 で追加           | `icon: { path: SymbolPath.CIRCLE, ... }`                  |
-| `panTo()` + `setZoom()` が壊れる | v1.1.0 で修正      | 同一マイクロタスク内の変更は 1 回の `easeTo`/`jumpTo` に集約される |
+| `Polyline` が無い | v1.1.0 で追加 | `geolonia.maps.Polyline` |
+| `Polygon` が無い | v1.1.0 で追加 | `geolonia.maps.Polygon`（穴あきポリゴン対応） |
+| `Rectangle` が無い | v1.1.0 で追加 | `geolonia.maps.Rectangle` |
+| `Circle` が無い | v1.1.0 で追加 | `geolonia.maps.Circle`（`radius` はメートル） |
+| ベクター記号アイコンが無い | v1.1.0 で追加 | `icon: { path: SymbolPath.CIRCLE, ... }` |
+| `panTo()` + `setZoom()` が壊れる | v1.1.0 で修正 | 同一マイクロタスク内の変更は 1 回の `easeTo`/`jumpTo` に集約される |
 | `importLibrary("maps")` が `InfoWindow` を返さない | v1.1.0 で修正 | `importLibrary("maps")` が図形クラスと `InfoWindow` を含む |
 | `Point` / `Size` が無い | v1.1.0 で追加 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
-| カメラ操作 API の不足     | v1.1.0 で追加           | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
+| カメラ操作 API の不足 | v1.1.0 で追加 | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
 
 ### `panTo()` + `setZoom()` が直った仕組み（と残る注意点）
 
@@ -51,12 +51,12 @@ MapLibre 側が中断するため、途中まで動いた位置でズームさ�
 
 ### 2. 図形・マーカーのオプションが最小セットしかない
 
-| クラス                                  | 使えるオプション                                                          | 未対応                                                     |
+| クラス | 使えるオプション | 未対応 |
 | --------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `Polyline`                              | `path` / `map` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` | `icons`（矢印等）/ `geodesic` / `zIndex` / `editable` / `draggable` / `clickable` |
-| `Polygon` / `Rectangle` / `Circle`      | 上記 + `fillColor` / `fillOpacity`（`Polygon` は `paths`、`Rectangle` は `bounds`、`Circle` は `center`/`radius`） | 同上                                                       |
-| `Marker`                                | `position` / `map` / `title` / `icon`                                       | `draggable` / `label` / `zIndex` / `animation` / `opacity` / `anchorPoint` |
-| `InfoWindow`                            | `content`                                                                   | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
+| `Polyline` | `path` / `map` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` | `icons`（矢印等）/ `geodesic` / `zIndex` / `editable` / `draggable` / `clickable` |
+| `Polygon` / `Rectangle` / `Circle` | 上記 + `fillColor` / `fillOpacity`（`Polygon` は `paths`、`Rectangle` は `bounds`、`Circle` は `center`/`radius`） | 同上 |
+| `Marker` | `position` / `map` / `title` / `icon` | `draggable` / `label` / `zIndex` / `animation` / `opacity` / `anchorPoint` |
+| `InfoWindow` | `content` | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
 
 編集可能な図形（`editable: true` で頂点をドラッグ）は maps-suite の範囲外。
 `map._getImpl()` で取得した MapLibre インスタンスに描画プラグインを組み合わせる。
