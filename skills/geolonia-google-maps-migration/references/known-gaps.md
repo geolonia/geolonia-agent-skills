@@ -9,8 +9,13 @@
 
 ## 公式 API があるもの（回避策を書かない）
 
-次はすべて公式 API で書ける。自前レイヤーを描く、SVG data URI で丸マーカーを作る、
-`easeTo` に手でまとめる、といった回避策を新規コードに書かないこと。
+次の用途はすべて公式 API で書ける。**これらの用途については**、自前レイヤーを描く、
+SVG data URI で単純な記号を作る、`easeTo` に手でまとめる、といった回避策を新規コードに
+書かないこと。
+
+公式 API で足りない用途（図形のクリック判定、編集可能な図形、`Symbol` で表現できない
+アイコン、既定 UI の個別出し分けなど）は下の「残っているギャップ」を参照する。そこでは
+自前レイヤーや data URI が引き続き正しい手段になる。
 
 | 用途                          | 使う API                                                            |
 | ----------------------------- | ------------------------------------------------------------------- |
@@ -45,8 +50,10 @@ map.data.setStyle({ fillColor: "#ff0000", strokeWeight: 2 });
 
 `setStyle` にはフィーチャを受け取る関数も渡せる。指定できるのは `fillColor` /
 `fillOpacity` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible`。
-個別のフィーチャは `add` / `remove` / `getFeatureById` / `forEach` で扱い、
-`toGeoJson(callback)` で書き出す。
+個別のフィーチャは `add` / `remove` / `getFeatureById` / `forEach` で扱う。これらが返す
+フィーチャは `geolonia.maps.DataFeature` のインスタンスで、`setStyle` に関数を渡した
+場合もこの型が引数に来る（`getGeometry` / `getProperty` / `setProperty` / `getId` など）。
+書き出しは `toGeoJson(callback)`。
 
 図形クラスと同じく、`Data` のフィーチャも `click` を発火しない。
 

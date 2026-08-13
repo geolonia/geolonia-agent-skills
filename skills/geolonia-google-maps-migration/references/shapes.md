@@ -71,7 +71,7 @@ line.setPath(newPoints); // まるごと差し替える
 レイヤーとして描き、レイヤー ID を自分で持ってクリックを取る。
 
 ```js
-geolonia.maps.event.addListenerOnce(map, 'idle', () => {
+map.whenReady().then(() => {
   const impl = map.getGeoloniaMap();
   impl.addSource('clickable-areas', { type: 'geojson', data: toGeoJSON(areas) });
   impl.addLayer({
@@ -87,10 +87,13 @@ geolonia.maps.event.addListenerOnce(map, 'idle', () => {
 });
 ```
 
-`geolonia.maps.event.addListenerOnce(map, "idle", handler)` は公開 API（`MVCObject` 経由）
-なので、「地図の準備待ち」自体はプライベート API に依存せずに書ける。
-`map.getGeoloniaMap()` に渡す座標は MapLibre の作法通り `[lng, lat]` の配列（`{lat, lng}` literal
-ではない）である点に注意。
+準備待ちには `map.whenReady()` を使う。`event.addListenerOnce(map, "idle", handler)` は
+**登録より後に起きる `idle` しか拾わない**ため、すでに読み込みが終わっている地図に対して
+呼ぶと、`addSource()` も `addLayer()` もクリック登録も実行されない。
+
+`map.getGeoloniaMap()` が返す MapLibre インスタンスに渡す座標は、MapLibre の作法通り
+`[lng, lat]` の配列（`{lat, lng}` literal ではない）である点に注意。`getGeoloniaMap()`
+自体は引数を取らない。
 
 ## 数が多い場合の注意
 

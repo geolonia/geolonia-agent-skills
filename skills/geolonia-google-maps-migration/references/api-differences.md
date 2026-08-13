@@ -37,6 +37,11 @@ import { geolonia } from '@geolonia/maps-suite';
 
 `"places"` 等は空オブジェクトを返すため、分割代入した変数が実行時に `undefined` になる。
 
+`DataFeature` は `importLibrary("maps")` の戻り値には含まれないが、`geolonia.maps.DataFeature`
+として公開されている。`map.data` の `add` / `getFeatureById` / `forEach` が返すのがこの型で、
+`setStyle` に関数を渡した場合の引数もこれ。直接 `new` する場面は少ないが、型注釈を書くときや
+`instanceof` で判定するときに参照する。
+
 ## `Map` コンストラクタ
 
 ```js

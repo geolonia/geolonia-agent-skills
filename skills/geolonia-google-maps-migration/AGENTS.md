@@ -45,7 +45,8 @@
 - `MapOptions` に `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` /
   `fullscreenControl` / `streetViewControl` を渡さない（存在しないフィールド）。
   既定 UI を消すなら `disableDefaultUI: true` で一括指定する。
-- `center` / `zoom` の指定漏れを放置しない。既定値は `[0, 0]` / `z0`（全球）。
+- `center` / `zoom` の指定漏れを放置しない。既定値は `{ lat: 0, lng: 0 }` / `zoom: 0`（全球）。
+  Google Maps と違い、省略してもエラーにならず静かに全球表示になる。
 - 平面表示前提の UI で `threeDimensional` を省略しない。既定で 3D 建物が **ON**。
 - `panTo()` と `setZoom()` の間に `await` や `setTimeout` を挟まない。同じ同期処理の中で
   続けて呼べば 1 回のカメラ操作にまとまるが、間が空くとパンが中断される。まとめたいときは
