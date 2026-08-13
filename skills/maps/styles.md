@@ -7,8 +7,8 @@
 | スタイル名 | 説明 |
 |---|---|
 | `geolonia/basic-v2` | デフォルトのグローバルマップスタイル（現行の既定） |
-| `geolonia/basic-v1` | 初代のワールドマップスタイル |
-| `geolonia/basic` | 基本スタイル（現行 basic 系のエイリアス。現在は basic-v2 相当） |
+| `geolonia/basic-v1` | **非推奨**。一世代前の標準スタイル |
+| `geolonia/basic` | **非推奨**。初期の標準スタイル |
 | `geolonia/gsi` | 国土地理院データ + OpenStreetMap ベース（GSI Japan） |
 | `geolonia/midnight` | ダークテーマ（Geolonia Midnight） |
 | `geolonia/red-planet` | 赤系のテーマスタイル（Geolonia Red Planet） |
@@ -17,6 +17,11 @@
 | `geoloniamaps/smartcity-base` | スマートシティ向けベーススタイル |
 
 namespace に注意する。標準スタイルは `geolonia/` 配下だが、`smartcity-base` のみ `geoloniamaps/` 配下にある。
+
+`geolonia/basic` と `geolonia/basic-v1` は非推奨。配信は続いているので指定すれば動くが、
+`geolonia/basic-v2` とは**参照しているベクトルタイルが異なる**。エイリアスではないので、
+`geolonia/basic` を `basic-v2` と同じものとして扱わない。新しく書くコードでは
+`geolonia/basic-v2` を使い、既存コードでこれらを見かけた場合も移行を勧める。
 
 ### 使用例
 
