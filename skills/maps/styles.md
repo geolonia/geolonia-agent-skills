@@ -19,7 +19,7 @@
 namespace に注意する。標準スタイルは `geolonia/` 配下だが、`smartcity-base` のみ `geoloniamaps/` 配下にある。
 
 `geolonia/basic` と `geolonia/basic-v1` は非推奨。配信は続いているので指定すれば動くが、
-`geolonia/basic-v2` とは**参照しているベクトルタイルが異なる**。エイリアスではないので、
+`geolonia/basic-v2` とは**参照しているベクトルタイルが異なる**。エイリアスではないため、
 `geolonia/basic` を `basic-v2` と同じものとして扱わない。新しく書くコードでは
 `geolonia/basic-v2` を使い、既存コードでこれらを見かけた場合も移行を勧める。
 
