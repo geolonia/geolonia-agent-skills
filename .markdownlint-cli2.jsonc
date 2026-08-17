@@ -5,7 +5,11 @@
     "MD033": false,
     "MD034": false,
     "MD041": false,
-    "MD024": { "siblings_only": true }
+    "MD024": { "siblings_only": true },
+    // 表は compact（`| a | b |`）で統一する。既定の consistent は表ごとに
+    // スタイルを推測するが、桁を揃えた表は全角文字の幅を markdownlint が
+    // 文字数で数えるため、日本語では「揃っていない」と判定されてしまう。
+    "MD060": { "style": "compact" }
   },
   "ignores": ["node_modules/**", "tmp/**"]
 }
