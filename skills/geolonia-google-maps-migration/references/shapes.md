@@ -1,8 +1,8 @@
 # 図形（Polyline / Polygon / Rectangle / Circle）の移行
 
-v1.1.0 で 4 クラスとも実装された。Google Maps のコードは**ほぼそのまま移植できる**。
-v1.0.1 向けに書かれた「`map._getImpl()` + `addSource`/`addLayer` で線を引く」回避策は、
-もう新規コードには不要（[`known-gaps.md`](known-gaps.md) の「v1.1.0 で解消されたギャップ」）。
+4 クラスとも公式 API がある。Google Maps のコードは**ほぼそのまま移植できる**。
+「自前で `addSource`/`addLayer` して線を引く」回避策は新規コードには不要
+（[`known-gaps.md`](known-gaps.md) の「公式 API があるもの」）。
 
 ## そのまま移植できるもの
 
@@ -45,7 +45,7 @@ new geolonia.maps.Polyline({
 
 ## 地図の準備を待つ必要は無い
 
-`setMap()` は内部で `map._whenReady()` を待ってから MapLibre のソースとレイヤーを足す。
+`setMap()` は内部で地図の初期化完了を待ってから MapLibre のソースとレイヤーを足す。
 `idle` イベントを待ってから図形を作る、といった小細工は不要で、地図の生成直後に
 `new geolonia.maps.Polyline({ map, ... })` を呼んでよい。
 
@@ -67,12 +67,12 @@ line.setPath(newPoints); // まるごと差し替える
 ## クリックイベントが必要な場合
 
 図形クラスは `click` を発火しない（[`known-gaps.md`](known-gaps.md) の残ギャップ 1）。
-図形自体をクリック対象にしたい場合は、その図形だけ `map._getImpl()` を使って自前の
+図形自体をクリック対象にしたい場合は、その図形だけ `map.getGeoloniaMap()` を使って自前の
 レイヤーとして描き、レイヤー ID を自分で持ってクリックを取る。
 
 ```js
-geolonia.maps.event.addListenerOnce(map, 'idle', () => {
-  const impl = map._getImpl();
+map.whenReady().then(() => {
+  const impl = map.getGeoloniaMap();
   impl.addSource('clickable-areas', { type: 'geojson', data: toGeoJSON(areas) });
   impl.addLayer({
     id: 'clickable-areas-fill',
@@ -87,10 +87,13 @@ geolonia.maps.event.addListenerOnce(map, 'idle', () => {
 });
 ```
 
-`geolonia.maps.event.addListenerOnce(map, "idle", handler)` は公開 API（`MVCObject` 経由）
-なので、「地図の準備待ち」自体はプライベート API に依存せずに書ける。
-`map._getImpl()` に渡す座標は MapLibre の作法通り `[lng, lat]` の配列（`{lat, lng}` literal
-ではない）である点に注意。
+準備待ちには `map.whenReady()` を使う。`event.addListenerOnce(map, "idle", handler)` は
+**登録より後に起きる `idle` しか拾わない**ため、すでに読み込みが終わっている地図に対して
+呼ぶと、`addSource()` も `addLayer()` もクリック登録も実行されない。
+
+`map.getGeoloniaMap()` が返す MapLibre インスタンスに渡す座標は、MapLibre の作法通り
+`[lng, lat]` の配列（`{lat, lng}` literal ではない）である点に注意。`getGeoloniaMap()`
+自体は引数を取らない。
 
 ## 数が多い場合の注意
 

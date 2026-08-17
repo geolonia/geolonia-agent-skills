@@ -1,6 +1,7 @@
 # Google Maps と @geolonia/maps-suite の細かい API の違い
 
-対象バージョン: `@geolonia/maps-suite` v1.1.0。
+記述は `@geolonia/maps-suite` v1.2.2 時点。**常に最新版を使い、インストール済みの版が
+これより新しい場合は `node_modules/@geolonia/maps-suite/dist/npm/index.d.ts` を正とする。**
 
 見た目は「ほぼ同じ」だが、そのまま移植すると壊れる細部をまとめる。「存在しない機能」は
 [`known-gaps.md`](known-gaps.md) を参照。
@@ -25,19 +26,21 @@ import { geolonia } from '@geolonia/maps-suite';
 // Point / Size / SymbolPath / MVCObject / MVCArray / event / importLibrary が使える
 ```
 
-`geolonia.maps.importLibrary(name)` という非同期ローダーもある。v1.1.0 で返す内容が増え、
-Google Maps の分類に近づいた。
+`geolonia.maps.importLibrary(name)` という非同期ローダーもある。
 
 | 名前 | 返すもの |
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `"maps"` | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow` |
+| `"maps"` | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow`, `Data` |
 | `"marker"` | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer` |
 | `"core"` | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event` |
 | `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い） |
 
-v1.0.1 で `InfoWindow` がどのライブラリ名でも返らなかった問題は解消済みで、
-`importLibrary("maps")` から取れる。ただし `"places"` 等は空オブジェクトを返すため、
-分割代入した変数が実行時に `undefined` になる点は変わらない。
+`"places"` 等は空オブジェクトを返すため、分割代入した変数が実行時に `undefined` になる。
+
+`DataFeature` は `importLibrary("maps")` の戻り値には含まれないが、`geolonia.maps.DataFeature`
+として公開されている。`map.data` の `add` / `getFeatureById` / `forEach` が返すのがこの型で、
+`setStyle` に関数を渡した場合の引数もこれ。直接 `new` する場面は少ないが、型注釈を書くときや
+`instanceof` で判定するときに参照する。
 
 ## `Map` コンストラクタ
 
@@ -63,7 +66,7 @@ const map = new geolonia.maps.Map(document.getElementById('map'), {
 
 | フィールド | 既定値 | 備考 |
 | ------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `center` | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる（v1.1.0 で既定値が変わった） |
+| `center` | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる。Google Maps と違い省略してもエラーにならない |
 | `zoom` | `0` | 同上 |
 | `tilt` | `0` | MapLibre の pitch にマッピングされる |
 | `heading` | `0` | MapLibre の bearing にマッピングされる |
@@ -77,9 +80,10 @@ Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` / `restr
 エラーになる（削除が必要）。JavaScript から渡した場合の扱いは保証されないので、いずれにせよ
 削除すること。既定コントロールの出し分けは `disableDefaultUI` による一括指定のみ。
 
-移行時に見落としやすいのは**既定値の変化**。Google Maps では `center`/`zoom` は必須に近い
-指定だったため実害が出にくいが、条件分岐で省略しているコードがあると v1.1.0 では
-`zoom: 0` の全球表示に落ちる。3D 建物も既定 ON なので、平面表示を前提にした UI では
+移行時に見落としやすいのは**既定値**。Google Maps では `center`/`zoom` は実質必須で、
+省略すると地図が出ないので気づける。maps-suite は省略してもエラーにならず、
+`{ lat: 0, lng: 0 }` / `zoom: 0` の全球表示になる。条件分岐で省略しうるコードは、
+移行時に必ず既定値を補う。3D 建物も既定 ON なので、平面表示を前提にした UI では
 `threeDimensional: false` を明示する。
 
 ## カメラ操作
@@ -94,7 +98,7 @@ map.moveCamera({ center, zoom, tilt, heading }); // まとめて即時反映
 ```
 
 同じ同期処理の中で複数呼ぶと 1 回の `easeTo()`/`jumpTo()` にまとめられる。つまり Google Maps
-と同じ `panTo()` → `setZoom()` の書き方がそのまま動く（v1.0.1 では壊れていた。詳細は
+と同じ `panTo()` → `setZoom()` の書き方がそのまま動く（詳細は
 [`known-gaps.md`](known-gaps.md)）。`await` や `setTimeout` を挟むとまとまらないので、
 続けて動かしたいときは同じ関数内で連続して呼ぶか `moveCamera()` を使う。
 
@@ -104,7 +108,7 @@ map.moveCamera({ center, zoom, tilt, heading }); // まとめて即時反映
 // Google Maps: オプションオブジェクト
 infoWindow.open({ map, anchor: marker });
 
-// maps-suite: 位置引数（v1.1.0 でも変わっていない）
+// maps-suite: 位置引数
 infoWindow.open(map, marker);
 ```
 
@@ -113,20 +117,20 @@ infoWindow.open(map, marker);
 
 ## `Marker`
 
-`position` / `map` / `title` / `icon` が使える。`icon` は画像 URL（`{ url }`）に加えて
-v1.1.0 からベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）に対応した
+`position` / `map` / `title` / `icon` が使える。`icon` は画像 URL（`{ url }`）と
+ベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に対応
 （[`marker-icons.md`](marker-icons.md)）。`getPosition()` は `LatLng` インスタンス
 （`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`setPosition()` は
 `{lat, lng}` literal と `LatLng` インスタンスの両方を受け付ける。
 
 ## `Polyline` / `Polygon` / `Rectangle` / `Circle`
 
-v1.1.0 で追加された。クラス名を差し替えるだけでほぼ移植できるが、`click` イベントや
+クラス名を差し替えるだけでほぼ移植できるが、`click` イベントや
 `editable` / `draggable` / `zIndex` は未対応（[`shapes.md`](shapes.md)）。
 
 ## `Point` / `Size`
 
-v1.1.0 で追加。`new geolonia.maps.Point(x, y)` / `new geolonia.maps.Size(width, height)`。
+`new geolonia.maps.Point(x, y)` / `new geolonia.maps.Size(width, height)`。
 **インスタンスは実行時に凍結される**（`Object.freeze`）ため、Google Maps のように
 `point.x = 10` と後から書き換えるコードは silent に無視される（strict mode では例外）。
 新しいインスタンスを作り直すこと。
@@ -142,7 +146,7 @@ v1.1.0 で追加。`new geolonia.maps.Point(x, y)` / `new geolonia.maps.Size(wid
 ## 座標の形式
 
 Google Maps と同じく `{ lat, lng }` の literal を使う（Mapbox/MapLibre のような
-`[lng, lat]` 配列ではない）。ただし `map._getImpl()` で取得した生の MapLibre インスタンスに
+`[lng, lat]` 配列ではない）。ただし `map.getGeoloniaMap()` で取得した生の MapLibre インスタンスに
 直接触る場合は MapLibre の作法通り `[lng, lat]` の配列を使う必要があるので混同しないこと。
 
 ## イベント

@@ -1,8 +1,9 @@
 # マーカーアイコン（SymbolPath / 画像 URL）
 
-v1.1.0 で `MarkerOptions.icon` がベクター記号（`SymbolPath`）に対応した。Google Maps の
-`icon` 指定は**ほぼそのまま移植できる**。v1.0.1 向けの「SVG data URI を自前で組み立てる」
-回避策は新規コードには不要。
+`MarkerOptions.icon` はベクター記号（`SymbolPath`）に対応している。Google Maps の
+`icon` 指定は**ほぼそのまま移植できる**。`Symbol` で表現できる単純な記号のために
+「SVG data URI を自前で組み立てる」必要はない。複数パス・グラデーション・テキスト入りなど
+`Symbol` で表現しきれないアイコンでは、いまも data URI を使う（後述）。
 
 ## そのまま移植できるもの
 

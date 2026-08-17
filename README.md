@@ -21,10 +21,15 @@ Google Maps JavaScript API から `@geolonia/maps-suite`（Google Maps 互換 AP
 MapLibre GL JS ベースのライブラリ）への移行を支援します。
 
 - **移行手順**: 棚卸し → インストール → API キー取得 → 地図初期化 → マーカー/InfoWindow/
-  クラスタリング → Polyline 代替 → ビルド・動作確認
+  クラスタリング → 図形 → GeoJSON → カメラ操作 → ビルド・動作確認
 - **API 対応表**: `google.maps.*` と `geolonia.maps.*` のクラス・メソッド対応
-- **既知のギャップ**: Polyline/Polygon 未実装、ベクター記号アイコン未対応、
-  `panTo()` が `setZoom()` にキャンセルされる互換性バグ、とその回避策
+- **既知のギャップ**: 図形クラスがクリックイベントを発火しない、図形・マーカーの
+  オプションが最小セット、`MapOptions` に `gestureHandling`/`mapTypeId` 等が無い、
+  サービス系 API（Geocoder/Directions/Places）が未実装、とその回避策
+
+記述は `@geolonia/maps-suite` v1.2.2 時点。互換の範囲はリリースごとに広がるため、
+常に最新版を使い、記述より新しい版が入っている場合はインストール済みパッケージの
+型定義を正とする方針をスキル側に書いています。
 
 ## 要件
 

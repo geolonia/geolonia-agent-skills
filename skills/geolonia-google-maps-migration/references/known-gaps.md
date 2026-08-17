@@ -1,27 +1,63 @@
-# 既知のギャップ（@geolonia/maps-suite v1.1.0 時点）
+# 既知のギャップ（@geolonia/maps-suite v1.2.2 時点）
 
-`@geolonia/maps-suite` 側で対処されるまでは、ここに書く回避策を使う。新しいバージョンが
-リリースされたら、対象バージョンの型定義と実装を確認してこのリファレンスを更新すること。
+**この一覧はインストール済みの版より古いことがある。** 「無い」と書かれている機能を
+回避策で書く前に、必ず `node_modules/@geolonia/maps-suite/dist/npm/index.d.ts` を
+その名前で検索して、公式 API が無いことを確かめる。型定義が正で、この一覧は目安。
 
-## v1.1.0 で解消されたギャップ
+版を固定する理由が無いかぎり最新版を使う。互換の範囲はリリースごとに広がるため、
+古い版に留まると不要な回避策を書くことになる。
 
-v1.0.1 時点で回避策が必須だった以下は、**v1.1.0 では公式 API がある**。古い回避策
-（`_getImpl()` + `addSource`/`addLayer` で線を引く、SVG data URI で丸マーカーを作る、
-`easeTo` に手でまとめる）を新規コードに書かないこと。
+## 公式 API があるもの（回避策を書かない）
 
-| 内容 | 状態 | 対応する API |
-| --------------------------------------------- | ----------------------- | -------------------------------------------------------- |
-| `Polyline` が無い | v1.1.0 で追加 | `geolonia.maps.Polyline` |
-| `Polygon` が無い | v1.1.0 で追加 | `geolonia.maps.Polygon`（穴あきポリゴン対応） |
-| `Rectangle` が無い | v1.1.0 で追加 | `geolonia.maps.Rectangle` |
-| `Circle` が無い | v1.1.0 で追加 | `geolonia.maps.Circle`（`radius` はメートル） |
-| ベクター記号アイコンが無い | v1.1.0 で追加 | `icon: { path: SymbolPath.CIRCLE, ... }` |
-| `panTo()` + `setZoom()` が壊れる | v1.1.0 で修正 | 同一マイクロタスク内の変更は 1 回の `easeTo`/`jumpTo` に集約される |
-| `importLibrary("maps")` が `InfoWindow` を返さない | v1.1.0 で修正 | `importLibrary("maps")` が図形クラスと `InfoWindow` を含む |
-| `Point` / `Size` が無い | v1.1.0 で追加 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
-| カメラ操作 API の不足 | v1.1.0 で追加 | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
+次の用途はすべて公式 API で書ける。**これらの用途については**、自前レイヤーを描く、
+SVG data URI で単純な記号を作る、`easeTo` に手でまとめる、といった回避策を新規コードに
+書かないこと。
 
-### `panTo()` + `setZoom()` が直った仕組み（と残る注意点）
+公式 API で足りない用途（図形のクリック判定、編集可能な図形、`Symbol` で表現できない
+アイコン、既定 UI の個別出し分けなど）は下の「残っているギャップ」を参照する。そこでは
+自前レイヤーや data URI が引き続き正しい手段になる。
+
+| 用途 | 使う API |
+| ----------------------------- | ------------------------------------------------------------------- |
+| 折れ線 | `geolonia.maps.Polyline` |
+| 多角形 | `geolonia.maps.Polygon`（穴あきポリゴン対応） |
+| 矩形 | `geolonia.maps.Rectangle` |
+| 円 | `geolonia.maps.Circle`（`radius` はメートル） |
+| ベクター記号アイコン | `icon: { path: SymbolPath.CIRCLE, ... }` |
+| 座標・サイズの値 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
+| カメラ操作 | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
+| パンとズームの同時指定 | `panTo()` + `setZoom()` を同期的に続けて呼ぶ（下記） |
+| GeoJSON レイヤー | `map.data`（`addGeoJson` / `setStyle` / `toGeoJson`。下記） |
+| 土台の `GeoloniaMap` | `map.getGeoloniaMap()` |
+| 土台の MapLibre `Marker` | `marker.getMapLibreMarker()` |
+| 初期化の完了待ち | `map.whenReady()` |
+
+`importLibrary("maps")` は `Map` / `MapElement` / `OverlayView` / `Polyline` / `Polygon` /
+`Rectangle` / `Circle` / `InfoWindow` / `Data` を返す。
+
+`_getImpl()` と `_whenReady()` は内部用として残っているが、公開 API があるので新規コードには
+書かない。なお `getGeoloniaMap()` 経由で center / zoom / tilt / heading を直接変更した場合の
+動作は保証されない。カメラ操作は maps-suite 側の API を使う。
+
+### GeoJSON（`map.data`）
+
+`google.maps.Data` に相当する。`map.data` は最初の参照時に作られる。
+
+```js
+map.data.addGeoJson(featureCollection);
+map.data.setStyle({ fillColor: "#ff0000", strokeWeight: 2 });
+```
+
+`setStyle` にはフィーチャを受け取る関数も渡せる。指定できるのは `fillColor` /
+`fillOpacity` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible`。
+個別のフィーチャは `add` / `remove` / `getFeatureById` / `forEach` で扱う。これらが返す
+フィーチャは `geolonia.maps.DataFeature` のインスタンスで、`setStyle` に関数を渡した
+場合もこの型が引数に来る（`getGeometry` / `getProperty` / `setProperty` / `getId` など）。
+書き出しは `toGeoJson(callback)`。
+
+図形クラスと同じく、`Data` のフィーチャも `click` を発火しない。
+
+### `panTo()` + `setZoom()` の仕組み（と注意点）
 
 `Map` は `setCenter`/`panTo`/`setZoom`/`setTilt`/`setHeading`/`moveCamera` の呼び出しを
 いったん内部バッファに溜め、マイクロタスクで 1 回だけ MapLibre に反映する
@@ -59,7 +95,7 @@ MapLibre 側が中断するため、途中まで動いた位置でズームさ�
 | `InfoWindow` | `content` | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
 
 編集可能な図形（`editable: true` で頂点をドラッグ）は maps-suite の範囲外。
-`map._getImpl()` で取得した MapLibre インスタンスに描画プラグインを組み合わせる。
+`map.getGeoloniaMap()` で取得した MapLibre インスタンスに描画プラグインを組み合わせる。
 
 ### 3. `MapOptions` に無いフィールド
 
@@ -67,7 +103,7 @@ MapLibre 側が中断するため、途中まで動いた位置でズームさ�
 `disableDefaultUI` のみ。Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` /
 `maxZoom` / `restriction` / コントロール個別指定（`zoomControl` 等）は型に存在しない。
 既定 UI は `disableDefaultUI: true` による一括非表示のみで、個別の出し分けはできない
-（必要なら `map._getImpl()` に対して MapLibre のコントロールを自前で足す）。
+（必要なら `map.getGeoloniaMap()` に対して MapLibre のコントロールを自前で足す）。
 
 ### 4. サービス系 API（Geocoder / Directions / Places）が未実装
 
