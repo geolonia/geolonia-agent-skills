@@ -28,12 +28,12 @@ import { geolonia } from '@geolonia/maps-suite';
 
 `geolonia.maps.importLibrary(name)` という非同期ローダーもある。
 
-| 名前                                                | 返すもの                                                                     |
+| 名前 | 返すもの |
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `"maps"`                                            | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow`, `Data` |
-| `"marker"`                                          | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer`                           |
-| `"core"`                                            | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event`                |
-| `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い）           |
+| `"maps"` | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow`, `Data` |
+| `"marker"` | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer` |
+| `"core"` | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event` |
+| `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い） |
 
 `"places"` 等は空オブジェクトを返すため、分割代入した変数が実行時に `undefined` になる。
 
@@ -64,16 +64,16 @@ const map = new geolonia.maps.Map(document.getElementById('map'), {
 
 `MapOptions` で使えるのは以下だけ。
 
-| フィールド          | 既定値            | 備考                                                                     |
+| フィールド | 既定値 | 備考 |
 | ------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `center`            | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる。Google Maps と違い省略してもエラーにならない |
-| `zoom`              | `0`               | 同上                                                                     |
-| `tilt`              | `0`               | MapLibre の pitch にマッピングされる                                     |
-| `heading`           | `0`               | MapLibre の bearing にマッピングされる                                   |
-| `style`             | maps-core の既定  | Geolonia のスタイル識別子またはスタイル URL                              |
-| `apiKey`            | なし              | `<script src="...?key=XXX">` からの自動取得にも対応                      |
-| `threeDimensional`  | `true`            | **3D 建物が既定で有効**。切るなら `false` を明示する                     |
-| `disableDefaultUI`  | `false`           | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
+| `center` | `{ lat: 0, lng: 0 }` | 省略時は「全球」表示になる。Google Maps と違い省略してもエラーにならない |
+| `zoom` | `0` | 同上 |
+| `tilt` | `0` | MapLibre の pitch にマッピングされる |
+| `heading` | `0` | MapLibre の bearing にマッピングされる |
+| `style` | maps-core の既定 | Geolonia のスタイル識別子またはスタイル URL |
+| `apiKey` | なし | `<script src="...?key=XXX">` からの自動取得にも対応 |
+| `threeDimensional` | `true` | **3D 建物が既定で有効**。切るなら `false` を明示する |
+| `disableDefaultUI` | `false` | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
 
 Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` / `restriction` /
 コントロール個別指定（`zoomControl` など）は型に存在しないため、TypeScript ではコンパイル

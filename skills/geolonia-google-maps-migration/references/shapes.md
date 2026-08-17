@@ -32,12 +32,12 @@ new geolonia.maps.Polyline({
 });
 ```
 
-| クラス      | 主なオプション                                                                | 主なメソッド                                                                  |
+| クラス | 主なオプション | 主なメソッド |
 | ----------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `Polyline`  | `path` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` / `map` | `getPath` / `setPath` / `getVisible` / `setVisible` / `setOptions` / `setMap`    |
-| `Polygon`   | `paths` + 上記 + `fillColor` / `fillOpacity`                                  | `getPath` / `getPaths` / `setPath` / `setPaths` / 他は同じ                       |
-| `Rectangle` | `bounds` + stroke/fill 系                                                     | `getBounds` / `setBounds` / 他は同じ                                             |
-| `Circle`    | `center` / `radius`（メートル）+ stroke/fill 系                               | `getCenter` / `setCenter` / `getRadius` / `setRadius` / `getBounds` / 他は同じ   |
+| `Polyline` | `path` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` / `map` | `getPath` / `setPath` / `getVisible` / `setVisible` / `setOptions` / `setMap` |
+| `Polygon` | `paths` + 上記 + `fillColor` / `fillOpacity` | `getPath` / `getPaths` / `setPath` / `setPaths` / 他は同じ |
+| `Rectangle` | `bounds` + stroke/fill 系 | `getBounds` / `setBounds` / 他は同じ |
+| `Circle` | `center` / `radius`（メートル）+ stroke/fill 系 | `getCenter` / `setCenter` / `getRadius` / `setRadius` / `getBounds` / 他は同じ |
 
 座標は Google Maps と同じ `{ lat, lng }` literal（または `LatLng` インスタンス）。
 `Polygon` の `paths` に配列の配列を渡すと、最初のリングが外周、以降が穴になる

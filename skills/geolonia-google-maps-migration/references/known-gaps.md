@@ -17,20 +17,20 @@ SVG data URI で単純な記号を作る、`easeTo` に手でまとめる、と�
 アイコン、既定 UI の個別出し分けなど）は下の「残っているギャップ」を参照する。そこでは
 自前レイヤーや data URI が引き続き正しい手段になる。
 
-| 用途                          | 使う API                                                            |
+| 用途 | 使う API |
 | ----------------------------- | ------------------------------------------------------------------- |
-| 折れ線                        | `geolonia.maps.Polyline`                                              |
-| 多角形                        | `geolonia.maps.Polygon`（穴あきポリゴン対応）                         |
-| 矩形                          | `geolonia.maps.Rectangle`                                             |
-| 円                            | `geolonia.maps.Circle`（`radius` はメートル）                         |
-| ベクター記号アイコン          | `icon: { path: SymbolPath.CIRCLE, ... }`                              |
-| 座標・サイズの値              | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable）             |
-| カメラ操作                    | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI`    |
-| パンとズームの同時指定        | `panTo()` + `setZoom()` を同期的に続けて呼ぶ（下記）                  |
-| GeoJSON レイヤー              | `map.data`（`addGeoJson` / `setStyle` / `toGeoJson`。下記）           |
-| 土台の `GeoloniaMap`          | `map.getGeoloniaMap()`                                                |
-| 土台の MapLibre `Marker`      | `marker.getMapLibreMarker()`                                          |
-| 初期化の完了待ち              | `map.whenReady()`                                                     |
+| 折れ線 | `geolonia.maps.Polyline` |
+| 多角形 | `geolonia.maps.Polygon`（穴あきポリゴン対応） |
+| 矩形 | `geolonia.maps.Rectangle` |
+| 円 | `geolonia.maps.Circle`（`radius` はメートル） |
+| ベクター記号アイコン | `icon: { path: SymbolPath.CIRCLE, ... }` |
+| 座標・サイズの値 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
+| カメラ操作 | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
+| パンとズームの同時指定 | `panTo()` + `setZoom()` を同期的に続けて呼ぶ（下記） |
+| GeoJSON レイヤー | `map.data`（`addGeoJson` / `setStyle` / `toGeoJson`。下記） |
+| 土台の `GeoloniaMap` | `map.getGeoloniaMap()` |
+| 土台の MapLibre `Marker` | `marker.getMapLibreMarker()` |
+| 初期化の完了待ち | `map.whenReady()` |
 
 `importLibrary("maps")` は `Map` / `MapElement` / `OverlayView` / `Polyline` / `Polygon` /
 `Rectangle` / `Circle` / `InfoWindow` / `Data` を返す。
@@ -87,12 +87,12 @@ MapLibre 側が中断するため、途中まで動いた位置でズームさ�
 
 ### 2. 図形・マーカーのオプションが最小セットしかない
 
-| クラス                                  | 使えるオプション                                                          | 未対応                                                     |
+| クラス | 使えるオプション | 未対応 |
 | --------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `Polyline`                              | `path` / `map` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` | `icons`（矢印等）/ `geodesic` / `zIndex` / `editable` / `draggable` / `clickable` |
-| `Polygon` / `Rectangle` / `Circle`      | 上記 + `fillColor` / `fillOpacity`（`Polygon` は `paths`、`Rectangle` は `bounds`、`Circle` は `center`/`radius`） | 同上                                                       |
-| `Marker`                                | `position` / `map` / `title` / `icon`                                       | `draggable` / `label` / `zIndex` / `animation` / `opacity` / `anchorPoint` |
-| `InfoWindow`                            | `content`                                                                   | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
+| `Polyline` | `path` / `map` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` | `icons`（矢印等）/ `geodesic` / `zIndex` / `editable` / `draggable` / `clickable` |
+| `Polygon` / `Rectangle` / `Circle` | 上記 + `fillColor` / `fillOpacity`（`Polygon` は `paths`、`Rectangle` は `bounds`、`Circle` は `center`/`radius`） | 同上 |
+| `Marker` | `position` / `map` / `title` / `icon` | `draggable` / `label` / `zIndex` / `animation` / `opacity` / `anchorPoint` |
+| `InfoWindow` | `content` | `maxWidth` / `pixelOffset` / `position`（`open()` は位置引数のみ） |
 
 編集可能な図形（`editable: true` で頂点をドラッグ）は maps-suite の範囲外。
 `map.getGeoloniaMap()` で取得した MapLibre インスタンスに描画プラグインを組み合わせる。
