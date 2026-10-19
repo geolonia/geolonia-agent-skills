@@ -1,10 +1,27 @@
 # Google Maps と @geolonia/maps-suite の細かい API の違い
 
-記述は `@geolonia/maps-suite` v1.2.2 時点。**常に最新版を使い、インストール済みの版が
+記述は `@geolonia/maps-suite` v2.1.0 時点。**常に最新版を使い、インストール済みの版が
 これより新しい場合は `node_modules/@geolonia/maps-suite/dist/npm/index.d.ts` を正とする。**
 
 見た目は「ほぼ同じ」だが、そのまま移植すると壊れる細部をまとめる。「存在しない機能」は
 [`known-gaps.md`](known-gaps.md) を参照。
+
+## インストールと読み込み
+
+```sh
+npm install @geolonia/maps-suite maplibre-gl
+```
+
+- `maplibre-gl` は peer dependency で、**v6 系**（`^6.11.2`）が必要。v5 以前が入っている
+  プロジェクトでは `npm install maplibre-gl@^6.11.2` で上げる。
+- パッケージは **ESM 専用**。`require('@geolonia/maps-suite')` では読めないので、
+  `import` で読み込む（CommonJS のコードは移行時に ESM へ書き換える）。
+- MapLibre の worker はパッケージに同梱されていて、最初の `Map` を作る前に自動で設定される。
+  `maplibregl.setWorkerUrl()` を書く必要は無い。worker は Blob URL から動くので、
+  Content-Security-Policy を設定しているページでは `worker-src blob:` を許可する。
+- 同梱の worker は maps-suite のビルドに使った `maplibre-gl` の版のもの。別の版の
+  `maplibre-gl` を入れていると、両方の版を示す警告がコンソールに出る。地図の表示が
+  おかしい場合は、警告が示す版の `maplibre-gl` を入れる。
 
 ## モジュールの取得方法
 
@@ -74,10 +91,12 @@ const map = new geolonia.maps.Map(document.getElementById('map'), {
 | `apiKey` | なし | `<script src="...?key=XXX">` からの自動取得にも対応 |
 | `threeDimensional` | `true` | **3D 建物が既定で有効**。切るなら `false` を明示する |
 | `disableDefaultUI` | `false` | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
+| `gestureHandling` | `"auto"` と同じ | `"cooperative"` / `"greedy"` / `"none"` / `"auto"`。Google Maps と同じ値 |
+| `minZoom` | MapLibre の既定 | ズームの下限 |
+| `maxZoom` | MapLibre の既定 | ズームの上限 |
 
-Google Maps の `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` / `restriction` /
-コントロール個別指定（`zoomControl` など）は型に存在しないため、TypeScript ではコンパイル
-エラーになる（削除が必要）。JavaScript から渡した場合の扱いは保証されないので、いずれにせよ
+Google Maps の `mapTypeId` / `restriction` / コントロール個別指定（`zoomControl` など）は
+型に存在しないため、TypeScript ではコンパイルエラーになる（削除が必要）。JavaScript から渡した場合の扱いは保証されないので、いずれにせよ
 削除すること。既定コントロールの出し分けは `disableDefaultUI` による一括指定のみ。
 
 移行時に見落としやすいのは**既定値**。Google Maps では `center`/`zoom` は実質必須で、
@@ -104,12 +123,11 @@ map.moveCamera({ center, zoom, tilt, heading }); // まとめて即時反映
 
 ## `InfoWindow.open()` の引数
 
-```js
-// Google Maps: オプションオブジェクト
-infoWindow.open({ map, anchor: marker });
+Google Maps と同じオプションオブジェクト形式と、旧来の位置引数形式のどちらでも呼べる。
 
-// maps-suite: 位置引数
-infoWindow.open(map, marker);
+```js
+infoWindow.open({ map, anchor: marker });
+infoWindow.open(map, marker); // 同じ意味
 ```
 
 `infoWindow.close()` は同じ。`addListener('closeclick', handler)` も同じ。
@@ -117,16 +135,16 @@ infoWindow.open(map, marker);
 
 ## `Marker`
 
-`position` / `map` / `title` / `icon` が使える。`icon` は画像 URL（`{ url }`）と
-ベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に対応
-（[`marker-icons.md`](marker-icons.md)）。`getPosition()` は `LatLng` インスタンス
+`position` / `map` / `title` / `icon` / `label` / `zIndex` が使える。`icon` は画像 URL
+（`{ url }`）とベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に
+対応し、`label` は文字列か `MarkerLabel` を受け付ける（[`marker-icons.md`](marker-icons.md)）。`getPosition()` は `LatLng` インスタンス
 （`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`setPosition()` は
 `{lat, lng}` literal と `LatLng` インスタンスの両方を受け付ける。
 
 ## `Polyline` / `Polygon` / `Rectangle` / `Circle`
 
-クラス名を差し替えるだけでほぼ移植できるが、`click` イベントや
-`editable` / `draggable` / `zIndex` は未対応（[`shapes.md`](shapes.md)）。
+クラス名を差し替えるだけでほぼ移植できる。`click` イベントと `zIndex` にも対応している。
+`editable` / `draggable` は未対応（[`shapes.md`](shapes.md)）。
 
 ## `Point` / `Size`
 
@@ -153,4 +171,6 @@ Google Maps と同じく `{ lat, lng }` の literal を使う（Mapbox/MapLibre 
 
 `map.addListener("click", handler)` / `marker.addListener("click", handler)` は
 Google Maps と同じ書き方で動く（`MVCObject.addListener` がベース）。`click` イベントの
-`e.latLng` は `LatLng` インスタンス（`.lat()`/`.lng()`）。図形クラスは `click` を発火しない。
+`e.latLng` は `LatLng` インスタンス（`.lat()`/`.lng()`）。図形クラスの `click` も同じ形で、
+加えて元の DOM イベントが `e.domEvent` に入る。図形の上をクリックしたときは地図の `click` は
+発火しない。`map.data` のフィーチャは `click` を発火しない。
