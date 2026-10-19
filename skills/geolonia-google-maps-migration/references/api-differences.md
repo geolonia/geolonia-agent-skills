@@ -91,13 +91,13 @@ const map = new geolonia.maps.Map(document.getElementById('map'), {
 | `apiKey` | なし | `<script src="...?key=XXX">` からの自動取得にも対応 |
 | `threeDimensional` | `true` | **3D 建物が既定で有効**。切るなら `false` を明示する |
 | `disableDefaultUI` | `false` | `true` で既定コントロール（ナビ・現在地・全画面・スケール・ロゴ）を一括非表示 |
-| `gestureHandling` | `"auto"` と同じ | `"cooperative"` / `"greedy"` / `"none"` / `"auto"`。Google Maps と同じ値 |
+| `gestureHandling` | `"auto"` と同じ | `"cooperative"` / `"greedy"` / `"none"` / `"auto"`。`"auto"` と `"cooperative"` は同じ動作で、スクロールできるページでだけ Ctrl/⌘ + スクロールや 2 本指の操作を求める |
 | `minZoom` | MapLibre の既定 | ズームの下限 |
 | `maxZoom` | MapLibre の既定 | ズームの上限 |
 
 Google Maps の `mapTypeId` / `restriction` / コントロール個別指定（`zoomControl` など）は
-型に存在しないため、TypeScript ではコンパイルエラーになる（削除が必要）。JavaScript から渡した場合の扱いは保証されないので、いずれにせよ
-削除すること。既定コントロールの出し分けは `disableDefaultUI` による一括指定のみ。
+型に存在しないため、TypeScript ではコンパイルエラーになる（削除が必要）。JavaScript から
+渡した場合の扱いは保証されないので、いずれにせよ削除すること。既定コントロールの出し分けは `disableDefaultUI` による一括指定のみ。
 
 移行時に見落としやすいのは**既定値**。Google Maps では `center`/`zoom` は実質必須で、
 省略すると地図が出ないので気づける。maps-suite は省略してもエラーにならず、
@@ -137,8 +137,8 @@ infoWindow.open(map, marker); // 同じ意味
 
 `position` / `map` / `title` / `icon` / `label` / `zIndex` が使える。`icon` は画像 URL
 （`{ url }`）とベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に
-対応し、`label` は文字列か `MarkerLabel` を受け付ける（[`marker-icons.md`](marker-icons.md)）。`getPosition()` は `LatLng` インスタンス
-（`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`setPosition()` は
+対応し、`label` は文字列か `MarkerLabel` を受け付ける（[`marker-icons.md`](marker-icons.md)）。
+`getPosition()` は `LatLng` インスタンス（`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`setPosition()` は
 `{lat, lng}` literal と `LatLng` インスタンスの両方を受け付ける。
 
 ## `Polyline` / `Polygon` / `Rectangle` / `Circle`

@@ -125,8 +125,8 @@ map.whenReady().then(() => {
 | `Marker` | `position` / `map` / `title` / `icon` / `label` / `zIndex` | `draggable` / `animation` / `opacity` / `anchorPoint` |
 | `InfoWindow` | `content` | `maxWidth` / `pixelOffset` / `position` |
 
-図形は `clickable` を持たず、常にクリックを受け付ける。図形の上をクリックしても地図の
-`click` は発火しないため、「図形の上でも地図のクリック処理を動かしたい」コードは、
+図形は `clickable` を持たず、表示中は常にクリックを受け付ける（`visible: false` の間は
+受け付けない）。表示中の図形の上をクリックしても地図の `click` は発火しないため、「図形の上でも地図のクリック処理を動かしたい」コードは、
 図形の `click` リスナーから同じ処理を呼ぶ。
 
 編集可能な図形（`editable: true` で頂点をドラッグ）は maps-suite の範囲外。

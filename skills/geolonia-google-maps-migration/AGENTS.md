@@ -10,7 +10,7 @@
 
 - 移行先は `@geolonia/maps-suite`（`npm install @geolonia/maps-suite maplibre-gl`）。
   Google Maps 互換クラスを `geolonia.maps.*` として提供する。ESM 専用で、`maplibre-gl` は
-  v6 系が必要。worker は同梱されているので設定は要らない。
+  v6.11.2 以上の v6 系が必要。worker は同梱されているので設定は要らない。
 - ローダーは `import { geolonia } from '@geolonia/maps-suite'`。
   `geolonia.maps.importLibrary()` も使えるが、`geolonia.maps.*` を直接参照する方が
   書き分けが要らず簡単。

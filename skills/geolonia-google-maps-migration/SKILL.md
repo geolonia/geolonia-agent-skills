@@ -67,7 +67,7 @@ v2.1.0 時点で使える主なものは次のとおり。
 2. **インストール**: `npm install @geolonia/maps-suite maplibre-gl`
    （`maplibre-gl` は peer dependency）。**版は指定せず最新を入れる。**
    入った版は `npm ls @geolonia/maps-suite maplibre-gl` で確認しておく。パッケージは
-   **ESM 専用**（`require()` では読めない）で、`maplibre-gl` は v6 系が必要。worker は
+   **ESM 専用**（`require()` では読めない）で、`maplibre-gl` は v6.11.2 以上の v6 系が必要。worker は
    パッケージに同梱されるので `setWorkerUrl()` 等の設定は要らない
    （[`references/api-differences.md`](references/api-differences.md)）。
 3. **API キーの取得**: [app.geolonia.com](https://app.geolonia.com/) のコンソールで発行する
@@ -77,9 +77,9 @@ v2.1.0 時点で使える主なものは次のとおり。
    （[`references/api-differences.md`](references/api-differences.md)）。
 5. **地図の初期化**: `new geolonia.maps.Map(el, { center, zoom, style, apiKey })`。
    `gestureHandling`/`minZoom`/`maxZoom` はそのまま渡せる。`mapTypeId` 等は削除し、
-   既定コントロールを消したい場合は `disableDefaultUI: true` にまとめる。**`center`/`zoom` を省略すると `[0, 0]`/`z0` の
-   全球表示**、**3D 建物は既定 ON**（切るなら `threeDimensional: false`）という既定値に
-   注意（[`references/api-differences.md`](references/api-differences.md)）。
+   既定コントロールを消したい場合は `disableDefaultUI: true` にまとめる。
+   **`center`/`zoom` を省略すると `[0, 0]`/`z0` の全球表示**、**3D 建物は既定 ON**
+   （切るなら `threeDimensional: false`）という既定値に注意（[`references/api-differences.md`](references/api-differences.md)）。
 6. **マーカー・ポップアップ・クラスタリング**: `geolonia.maps.Marker`/`MarkerClusterer`
    はほぼそのまま移植できる。`label` / `zIndex` も同じ書き方で使える。
    `InfoWindow.open({ map, anchor })` もそのまま動く
@@ -88,7 +88,7 @@ v2.1.0 時点で使える主なものは次のとおり。
    （`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に対応。Google Maps の
    記述をそのまま移せる（[`references/marker-icons.md`](references/marker-icons.md)）。
 8. **図形（Polyline/Polygon/Rectangle/Circle）**: クラス名を差し替えるだけで移植できる。
-   地図の読み込み完了を待つ必要も無い。`addListener("click", ...)` と `zIndex` も
+   地図の読み込み完了を待つ必要も無い。`addListener('click', ...)` と `zIndex` も
    そのまま動く（[`references/shapes.md`](references/shapes.md)）。
 9. **GeoJSON**: `google.maps.Data` を使っているコードは `map.data` に移せる。
    `map.data.addGeoJson(featureCollection)` で追加し、`map.data.setStyle({ ... })` で
