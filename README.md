@@ -23,11 +23,11 @@ MapLibre GL JS ベースのライブラリ）への移行を支援します。
 - **移行手順**: 棚卸し → インストール → API キー取得 → 地図初期化 → マーカー/InfoWindow/
   クラスタリング → 図形 → GeoJSON → カメラ操作 → ビルド・動作確認
 - **API 対応表**: `google.maps.*` と `geolonia.maps.*` のクラス・メソッド対応
-- **既知のギャップ**: 図形クラスがクリックイベントを発火しない、図形・マーカーの
-  オプションが最小セット、`MapOptions` に `gestureHandling`/`mapTypeId` 等が無い、
+- **既知のギャップ**: `map.data` のフィーチャがクリックイベントを発火しない、図形・マーカーに
+  `editable`/`draggable` 等が無い、`MapOptions` に `mapTypeId`/`restriction` 等が無い、
   サービス系 API（Geocoder/Directions/Places）が未実装、とその回避策
 
-記述は `@geolonia/maps-suite` v1.2.2 時点。互換の範囲はリリースごとに広がるため、
+記述は `@geolonia/maps-suite` v2.1.0 時点。互換の範囲はリリースごとに広がるため、
 常に最新版を使い、記述より新しい版が入っている場合はインストール済みパッケージの
 型定義を正とする方針をスキル側に書いています。
 

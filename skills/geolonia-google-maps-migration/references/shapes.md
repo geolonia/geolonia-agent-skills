@@ -34,7 +34,7 @@ new geolonia.maps.Polyline({
 
 | クラス | 主なオプション | 主なメソッド |
 | ----------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `Polyline` | `path` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` / `map` | `getPath` / `setPath` / `getVisible` / `setVisible` / `setOptions` / `setMap` |
+| `Polyline` | `path` / `strokeColor` / `strokeOpacity` / `strokeWeight` / `visible` / `zIndex` / `map` | `getPath` / `setPath` / `getVisible` / `setVisible` / `getZIndex` / `setZIndex` / `setOptions` / `setMap` |
 | `Polygon` | `paths` + 上記 + `fillColor` / `fillOpacity` | `getPath` / `getPaths` / `setPath` / `setPaths` / 他は同じ |
 | `Rectangle` | `bounds` + stroke/fill 系 | `getBounds` / `setBounds` / 他は同じ |
 | `Circle` | `center` / `radius`（メートル）+ stroke/fill 系 | `getCenter` / `setCenter` / `getRadius` / `setRadius` / `getBounds` / 他は同じ |
@@ -64,36 +64,39 @@ line.setPath(newPoints); // まるごと差し替える
 
 削除は Google Maps と同じく `shape.setMap(null)`。内部のソースとレイヤーも一緒に片付く。
 
-## クリックイベントが必要な場合
+## クリックイベント
 
-図形クラスは `click` を発火しない（[`known-gaps.md`](known-gaps.md) の残ギャップ 1）。
-図形自体をクリック対象にしたい場合は、その図形だけ `map.getGeoloniaMap()` を使って自前の
-レイヤーとして描き、レイヤー ID を自分で持ってクリックを取る。
+Google Maps と同じく `addListener("click", handler)` で受け取れる。リスナーに渡る
+イベントは、クリック位置の `latLng`（`LatLng` インスタンス）と元の DOM イベントの
+`domEvent` を持つ。
 
 ```js
-map.whenReady().then(() => {
-  const impl = map.getGeoloniaMap();
-  impl.addSource('clickable-areas', { type: 'geojson', data: toGeoJSON(areas) });
-  impl.addLayer({
-    id: 'clickable-areas-fill',
-    type: 'fill',
-    source: 'clickable-areas',
-    // Feature ごとに色を変える場合は properties を参照する
-    paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.4 },
-  });
-  impl.on('click', 'clickable-areas-fill', (e) => {
-    console.log(e.features[0].properties);
-  });
+const area = new geolonia.maps.Polygon({ paths, map, fillColor: '#2f6fed' });
+area.addListener('click', (e) => {
+  console.log(e.latLng.lat(), e.latLng.lng(), e.domEvent.shiftKey);
 });
 ```
 
-準備待ちには `map.whenReady()` を使う。`event.addListenerOnce(map, "idle", handler)` は
-**登録より後に起きる `idle` しか拾わない**ため、すでに読み込みが終わっている地図に対して
-呼ぶと、`addSource()` も `addLayer()` もクリック登録も実行されない。
+表示中の図形の上をクリックしたときは、地図（`map`）の `click` は発火しない。地図の `click` で
+「何も無い場所のクリック」を処理しているコードは、そのまま移植できる。
 
-`map.getGeoloniaMap()` が返す MapLibre インスタンスに渡す座標は、MapLibre の作法通り
-`[lng, lat]` の配列（`{lat, lng}` literal ではない）である点に注意。`getGeoloniaMap()`
-自体は引数を取らない。
+`clickable` オプションは無く、表示中の図形は常にクリックを受け付ける。`visible: false` の間は
+図形の `click` は発火せず、その位置のクリックは地図の `click` になる。
+
+## 重なり順（`zIndex`）
+
+`zIndex` が大きい図形ほど手前に描かれる。既定は `0` で、同じ値の図形は地図に追加した順に
+重なる。後から変えるときは `setZIndex()` か `setOptions({ zIndex })`。
+
+```js
+new geolonia.maps.Polygon({ paths: base, map, zIndex: 1 });
+new geolonia.maps.Polygon({ paths: highlight, map, zIndex: 10 }); // 常に base の上
+```
+
+図形の `zIndex` は maps-suite の図形どうしの重なり順で、マーカー（DOM 要素）は常に図形より
+手前に出る。0 以外の `zIndex` を一度でも使うと、それ以降は図形を追加したときと `zIndex` を
+変えたときに、図形のレイヤーが地図の最前面（ベーススタイルの注記や `map.data` のレイヤーより
+上）へ並べ直される。その後で `map.getGeoloniaMap()` から足したレイヤーは、図形より上になる。
 
 ## 数が多い場合の注意
 

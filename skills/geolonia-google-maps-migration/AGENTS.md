@@ -1,6 +1,6 @@
 # Geolonia Google Maps 移行 クイックリファレンス（エージェント向け）
 
-`SKILL.md` の凝縮版。記述は `@geolonia/maps-suite` **v1.2.2** 時点。詳細は同ディレクトリの
+`SKILL.md` の凝縮版。記述は `@geolonia/maps-suite` **v2.1.0** 時点。詳細は同ディレクトリの
 `references/` を参照する。
 
 **常に最新版を使う。** インストール済みの版がここより新しい場合は、この文書ではなく
@@ -9,16 +9,18 @@
 ## 要点
 
 - 移行先は `@geolonia/maps-suite`（`npm install @geolonia/maps-suite maplibre-gl`）。
-  Google Maps 互換クラスを `geolonia.maps.*` として提供する。
+  Google Maps 互換クラスを `geolonia.maps.*` として提供する。ESM 専用で、`maplibre-gl` は
+  v6.11.2 以上の v6 系が必要。worker は同梱されているので設定は要らない。
 - ローダーは `import { geolonia } from '@geolonia/maps-suite'`。
   `geolonia.maps.importLibrary()` も使えるが、`geolonia.maps.*` を直接参照する方が
   書き分けが要らず簡単。
 - API キーは [app.geolonia.com](https://app.geolonia.com/) のコンソールで発行する
   （組織内に共有デモキーは無い）。プレースホルダーキーでも `geolonia/gsi` 等のベースタイル
   は表示されるため、UI ロジックの動作確認自体は実キー無しでも進められる。
-- 図形・ベクター記号アイコン・カメラ操作・GeoJSON（`map.data`）はすべて公式 API がある。
-  **古い回避策（自前レイヤーで線を引く / SVG data URI で丸マーカーを作る /
-  `easeTo` に手でまとめる）を新規コードに書かない。**
+- 図形（クリックと `zIndex` を含む）・マーカーの `label` / `zIndex`・ベクター記号アイコン・
+  カメラ操作・GeoJSON（`map.data`）はすべて公式 API がある。
+  **古い回避策（自前レイヤーで線を引く・クリックを取る / SVG data URI で丸マーカーや
+  文字入りマーカーを作る / `easeTo` に手でまとめる）を新規コードに書かない。**
 - 土台に降りるときは公開 API を使う（`map.getGeoloniaMap()` / `marker.getMapLibreMarker()` /
   `map.whenReady()`）。
 
@@ -30,21 +32,24 @@
 | `new google.maps.Marker(opts)` | `new geolonia.maps.Marker(opts)`（ほぼ同じ） |
 | `icon: { path: SymbolPath.CIRCLE, ... }` | 同じ書き方でよい（`geolonia.maps.SymbolPath`） |
 | `new google.maps.InfoWindow(opts)` | `new geolonia.maps.InfoWindow(opts)`（`content` のみ） |
-| `infoWindow.open({ map, anchor })` | `infoWindow.open(map, anchor)`（**位置引数**） |
+| `infoWindow.open({ map, anchor })` | 同じ書き方でよい（`open(map, anchor)` も可） |
+| `marker.setLabel()` / `setZIndex()` | 同名で使える（`label` / `zIndex` オプションも） |
 | `new MarkerClusterer({ map, markers })` | `new geolonia.maps.MarkerClusterer({ map, markers })` |
 | `new google.maps.Polyline(...)` | `new geolonia.maps.Polyline(...)`（Polygon / Rectangle / Circle も同様） |
-| `polygon.addListener('click', ...)` | **発火しない**。`map.getGeoloniaMap()` で自前レイヤーを描いて `impl.on('click', layerId, ...)` |
+| `polygon.addListener('click', ...)` | 同じ書き方でよい（`e.latLng` / `e.domEvent`）。図形上のクリックで地図の `click` は発火しない |
+| `map.data.addListener('click', ...)` | **発火しない**。`map.getGeoloniaMap()` で自前レイヤーを描いて `impl.on('click', layerId, ...)` |
 | `map.moveCamera({...})` / `setHeading()` | 同名で使える（`setTilt()` も） |
 | `new google.maps.Geocoder()` など | **存在しない**。community-geocoder 等を別途組み合わせる |
 | `map.data.addGeoJson(...)` | 同名で使える（`geolonia.maps.Data`。`setStyle` / `toGeoJson` も） |
 
 ## Do not（やってはいけない）
 
-- 棚卸し（サービス系 API・図形のクリック・`draggable`/`editable` の有無）をせずに移行を
-  始めない。実装の途中で「無い」と気づくと手戻りが大きい。
-- `MapOptions` に `gestureHandling` / `mapTypeId` / `minZoom` / `maxZoom` /
-  `fullscreenControl` / `streetViewControl` を渡さない（存在しないフィールド）。
-  既定 UI を消すなら `disableDefaultUI: true` で一括指定する。
+- 棚卸し（サービス系 API・`map.data` のクリック・`draggable`/`editable` の有無）をせずに
+  移行を始めない。実装の途中で「無い」と気づくと手戻りが大きい。
+- `MapOptions` に `mapTypeId` / `restriction` / `fullscreenControl` / `streetViewControl` を
+  渡さない（存在しないフィールド）。既定 UI を消すなら `disableDefaultUI: true` で一括指定する。
+  `gestureHandling` / `minZoom` / `maxZoom` は使える。
+- `require()` で読み込まない（ESM 専用）。`maplibregl.setWorkerUrl()` も書かない（worker は同梱）。
 - `center` / `zoom` の指定漏れを放置しない。既定値は `{ lat: 0, lng: 0 }` / `zoom: 0`（全球）。
   Google Maps と違い、省略してもエラーにならず静かに全球表示になる。
 - 平面表示前提の UI で `threeDimensional` を省略しない。既定で 3D 建物が **ON**。
