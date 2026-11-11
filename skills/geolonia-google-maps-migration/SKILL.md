@@ -97,7 +97,7 @@ v2.2.0 時点で使える主なものは次のとおり。
    見た目を指定する。スタイルは関数も渡せるので、フィーチャごとの出し分けもできる。
 10. **ジオコーディング**: `new google.maps.Geocoder()` の `geocode({ address })` は
     `geolonia.maps.Geocoder` にそのまま移せる。Promise 形式とコールバック形式のどちらも動く。
-    結果は常に 1 件で、`formatted_address` は `日本、` で始まる。Content-Security-Policy を
+    結果は常に 1 件で、`formatted_address` は（`日本` だけを入力した場合を除き）`日本、` で始まる。Content-Security-Policy を
     設定しているページでは住所データ API の origin を `connect-src` に足す
     （[`references/api-differences.md`](references/api-differences.md)）。
 11. **カメラ操作**: `panTo()` の直後の `setZoom()` は正しく動く（同一の同期処理内の

@@ -164,13 +164,17 @@ new geolonia.maps.Marker({ position: results[0].geometry.location, map });
   `INVALID_REQUEST` で reject される。逆ジオコーディングは [`geolonia-map`](../../maps/SKILL.md)
   スキルの `geocoding.md`（Open Reverse Geocoder）を使う。
 - `bounds` / `componentRestrictions` / `language` / `region` は受け付けるが、結果には影響しない。
-- 結果は常に 1 件。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる。
+- 結果は常に 1 件。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる
+  （`日本` だけを入力した場合は国を表す `日本`）。郵便番号だけの入力は `ZERO_RESULTS` になる。
   `place_id` は常に空文字列。
 - `geometry.location_type` は、住居表示住所か地番の位置まで特定できたときが `ROOFTOP`、
   町字・市区町村・都道府県の代表点のときが `APPROXIMATE`。入力より粗い位置しか得られなかった
   場合や、建物名などが残った場合は `partial_match: true` になる。
 - 住所を特定できないと `code` が `ZERO_RESULTS` の `MapsRequestError` で reject される。
   reject させずに空の `results` を受け取りたいときは `fulfillOnZeroResults: true` を渡す。
+  住所データの取得に失敗したときは `code` が `ERROR` になる。ただし取得の失敗をすべて検出できる
+  わけではなく、住居表示住所のデータが取れなかった場合は `ERROR` にならず、粗い `APPROXIMATE` の
+  結果が返ることがある。
   コールバック形式（`geocode(request, (results, status) => { ... })`）も使える。
 - 住所データは検索のたびに `https://japanese-addresses-v2.geoloniamaps.com` から必要な分だけ
   取得するため、ある都道府県や市区町村で最初の検索は 2 回目以降より遅い。Content-Security-Policy を
