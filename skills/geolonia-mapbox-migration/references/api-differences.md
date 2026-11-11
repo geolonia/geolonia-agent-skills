@@ -133,7 +133,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 
 - 自前の画像の ID は、スプライトの画像と重ならない名前にする。`style.load` はスプライトの読み込みより先に発火するので、同じ ID の画像がスプライトにあると、足した画像が後からスプライトの画像で上書きされる。
 - `setData()` でソースのデータを更新しているなら、最新のデータをアプリ側の変数に持っておき、足し直すときはそれを使う。
-- URL のスタイルの取得に失敗すると、`style.load` は発火せず、元のスタイルも消えた状態になる。切り替えの間は `error` イベントを見て、失敗したら `map.off('style.load', restoreCustomLayers)` でリスナーを外し、元のスタイルを設定し直す（`error` はタイルの取得失敗などでも発火するので、切り替えの間だけ見る）。
+- URL のスタイルの取得に失敗すると、`style.load` は発火せず、元のスタイルも消えた状態になる。`error` はタイルの取得失敗などでも発火するので、`e.error.url` が切り替え先のスタイルの URL と一致するものだけを失敗として扱い、リスナーを外したうえで、同じ手順で元のスタイルに戻す（戻した先でも自前のレイヤーを足し直すため）。
 
 ```js
 let currentPoints = initialPoints; // setData() するときは、この変数も更新する
@@ -148,8 +148,23 @@ function restoreCustomLayers() {
 
 map.on('load', restoreCustomLayers); // 最初の読み込み
 
+let currentStyle = initialStyleUrl;
+
 function switchStyle(nextStyle) {
-  map.once('style.load', restoreCustomLayers); // setStyle の前に登録する
+  const previousStyle = currentStyle;
+  const onLoad = () => {
+    map.off('error', onError);
+    currentStyle = nextStyle;
+    restoreCustomLayers();
+  };
+  const onError = (e) => {
+    if (e.error?.url !== nextStyle) return; // スタイルの取得以外の error は無視する
+    map.off('error', onError);
+    map.off('style.load', onLoad);
+    switchStyle(previousStyle); // 元のスタイルに戻し、同じ手順で足し直す
+  };
+  map.on('error', onError);
+  map.once('style.load', onLoad); // setStyle の前に登録する
   map.setStyle(nextStyle, { diff: false });
 }
 ```
