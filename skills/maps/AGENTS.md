@@ -14,7 +14,7 @@
 
 - HTML の data 属性だけで表示できる → Embed API を使う
 - 動的な操作が必要 → JavaScript API（`geolonia.Map`）を使う
-- 外部の style.json を指定する → API キー不要
+- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する → 有効な API キーは不要（CDN の URL の `geolonia-api-key` パラメータ自体は省かない。値は `YOUR-API-KEY` のままでよい）
 
 ## Do not（やってはいけない）
 

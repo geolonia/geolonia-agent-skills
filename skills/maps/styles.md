@@ -44,7 +44,7 @@ const map = new geolonia.Map({
 
 ### 外部 style.json を使用
 
-自前の style.json URL を指定する場合、Geolonia API キーは不要:
+Geolonia のタイルを参照しない自前の style.json の URL を指定する場合、有効な Geolonia API キーは不要（CDN の URL の `geolonia-api-key` パラメータ自体は省かず、値は `YOUR-API-KEY` のままでよい）:
 
 ```html
 <div class="geolonia" data-style="https://example.com/my-style.json" style="height: 400px;"></div>
@@ -72,4 +72,4 @@ Geolonia のスタイルリポジトリはテンプレートリポジトリと�
 ## タイル・フォント
 
 - タイルスキーマ: OpenMapTiles 互換（https://github.com/geolonia/openmaptiles）
-- グリフ（フォント）: `https://glyphs.geolonia.com/fonts/{fontstack}/{range}.pbf`
+- グリフ（フォント）: `https://glyphs.geolonia.com/{fontstack}/{range}.pbf`。提供しているのは `Noto Sans CJK JP Regular` / `Bold` / `Light`、`Noto Sans Regular`、`Noto Sans Universal Regular` で、`text-font` に複数のフォントを並べると取得に失敗する

@@ -31,6 +31,16 @@ MapLibre GL JS ベースのライブラリ）への移行を支援します。
 常に最新版を使い、記述より新しい版が入っている場合はインストール済みパッケージの
 型定義を正とする方針をスキル側に書いています。
 
+### geolonia-mapbox-migration
+
+Mapbox GL JS から Geolonia Maps への移行を支援します。MapLibre GL JS は Mapbox GL JS v1.13 から分岐したライブラリなので、v1 時代からある API は名前空間の置き換えだけで動きます。このスキルは、置き換えだけでは済まない部分を扱います。
+
+- **移行先**: npm の `mapbox-gl` は `@geolonia/maps-core`、script タグの Mapbox GL JS は CDN の `embed/v5`
+- **移行手順**: 棚卸し、インストール、import と CSS、worker の設定、地図の初期化、既定値の確認、スタイルの置き換え、Mapbox 固有 API の書き換え、動作確認
+- **Mapbox 固有の機能**: `mapbox://` のスタイルとタイルのスキーマ、`setFog`・FreeCamera などの名前の違い、Standard スタイルの設定 API や 3D モデルレイヤーなど対応するものが無い機能、Mapbox の REST API とプラグイン
+
+記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v5`（MapLibre GL JS v5.19.0）の時点です。
+
 ## 要件
 
 - Claude Code v1.0.33 以降
@@ -96,14 +106,20 @@ skills/
 │   ├── geocoding.md           # ジオコーディング（住所↔座標変換・住所正規化）
 │   ├── styles.md              # マップスタイル一覧とカスタマイズ
 │   └── examples.md            # よくあるパターンのコード例
-└── geolonia-google-maps-migration/
-    ├── SKILL.md               # メインスキル定義（移行手順 + 振り返り）
+├── geolonia-google-maps-migration/
+│   ├── SKILL.md               # メインスキル定義（移行手順 + 振り返り）
+│   ├── AGENTS.md              # 凝縮版クイックリファレンス
+│   └── references/
+│       ├── known-gaps.md      # maps-suite に無い機能と回避策
+│       ├── api-differences.md # 細部が異なる API（InfoWindow.open() など）
+│       ├── marker-icons.md    # マーカーアイコン（SymbolPath / 画像 URL）
+│       └── shapes.md          # 図形（Polyline/Polygon/Rectangle/Circle）の移行
+└── geolonia-mapbox-migration/
+    ├── SKILL.md               # メインスキル定義（移行先の選び方 + 移行手順）
     ├── AGENTS.md              # 凝縮版クイックリファレンス
     └── references/
-        ├── known-gaps.md      # maps-suite に無い機能と回避策
-        ├── api-differences.md # 細部が異なる API（InfoWindow.open() など）
-        ├── marker-icons.md    # マーカーアイコン（SymbolPath / 画像 URL）
-        └── shapes.md          # 図形（Polyline/Polygon/Rectangle/Circle）の移行
+        ├── api-differences.md # import・worker 設定・GeoloniaMap の既定値・CDN の場合の差分
+        └── known-gaps.md      # Mapbox 固有の機能と、その代わりに使うもの
 ```
 
 ## ライセンス
