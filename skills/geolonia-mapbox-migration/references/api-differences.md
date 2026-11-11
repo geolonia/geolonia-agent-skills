@@ -76,7 +76,7 @@ import { setWorkerUrl } from 'maplibre-gl';
 setWorkerUrl('/maplibre-gl-worker.mjs');
 ```
 
-`/maplibre-gl-worker.mjs` はサイトのルートを指す。アプリを `/app/` のようなサブパスに置く場合は、コピーした場所に合わせてそのパスを含める（たとえば `new URL('maplibre-gl-worker.mjs', document.baseURI).href`）。
+`/maplibre-gl-worker.mjs` はサイトのルートを指す。アプリを `/app/` のようなサブパスに置く場合は、デプロイ先のベースパスを含めて書く（`setWorkerUrl('/app/maplibre-gl-worker.mjs')`、Vite なら `import.meta.env.BASE_URL` を前に付ける）。`document.baseURI` を基準にすると、`<base>` 要素の無い SPA では開いているページの URL が基準になり、`/app/orders/123` のような URL を直接開いたときに読み込めなくなる。
 
 Content-Security-Policy を設定しているページで、CDN から ES モジュールとして MapLibre を読み込む場合は、worker が Blob URL から動くので `worker-src blob:` を許可する。
 
@@ -109,7 +109,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 名前は Mapbox GL JS v1 と同じでも、MapLibre GL JS で書き方が変わったものがある。
 
 - `map.on()` は地図ではなく `Subscription` を返す。`map.on('load', a).on('click', b)` のようなチェーンは、1 行ずつに分ける（`once()` はハンドラを渡せば地図を返すのでチェーンできる。ハンドラ無しで呼ぶと Promise を返す）。
-- `map.loadImage(url, callback)` はコールバックを受け取らず、Promise を返す（`const { data } = await map.loadImage(url); map.addImage('id', data);`）。
+- `map.loadImage()` は MapLibre では Promise を返す（`const { data } = await map.loadImage(url); map.addImage('id', data);`）。ただし `GeoloniaMap` は後方互換として `loadImage(url, callback)` も受け付けるので、`GeoloniaMap` に移したコードはコールバックのままでも動く。
 - GeoJSON ソースの `getClusterExpansionZoom()` / `getClusterChildren()` / `getClusterLeaves()` も Promise を返す。コールバックを渡す書き方のままだと、コールバックは呼ばれない。
 - WebGL のオプション（`preserveDrawingBuffer`、`antialias`、`failIfMajorPerformanceCaveat`）は、`MapOptions` の直下ではなく `canvasContextAttributes` の中に書く。直下に書いたままだと効かず、地図の画像の書き出しなどが動かない。
 
@@ -118,7 +118,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 - `mapbox://styles/...` の代わりに、Geolonia のスタイル（`geolonia/basic-v2`、`geolonia/gsi`、`geolonia/midnight` など。一覧は [`geolonia-map`](../../maps/SKILL.md) スキルの `styles.md`）か、自前または外部の style.json を指定する。
 - Geolonia のタイルは OpenMapTiles 互換のスキーマで、Mapbox Streets のスキーマとはレイヤー名も属性名も違う。ベースマップのソースを参照して足していたレイヤー（`source: 'composite'`、`'source-layer': 'road'` など）は、OpenMapTiles のレイヤー名（`transportation` など）に合わせて書き直す。
 - 自前の GeoJSON ソースや自前のタイルから作ったレイヤーは、ソースの URL が `mapbox://` でなければそのまま動く。ただし `icon-image` は移行先のスタイルのスプライトから探されるので、移行前のスプライトにしか無い画像は表示されない。同じ名前の画像を `map.addImage()` で足すか、画像名を変える。
-- `map.setStyle()` でスタイルを差し替えると、`addSource` / `addLayer` で足したソースとレイヤーは消える（`load` も再び発火しない）。差し替えの後で足し直すか、`setStyle(style, { transformStyle })` で差し替え前のソースとレイヤーを新しいスタイルに引き継ぐ。
+- `map.setStyle()` でスタイルを差し替えると、`addSource` / `addLayer` / `addImage` で足したソース・レイヤー・画像は消える（`load` も再び発火しない）。URL を渡した `setStyle()` は読み込みが終わる前に戻るので、`map.once('style.load', ...)` の中で足し直す。直後に足すと、読み込み途中のスタイルとぶつかって例外になることがある。ソースとレイヤーは `setStyle(style, { transformStyle })` で新しいスタイルに引き継ぐこともできるが、画像は引き継がれないので `addImage` し直す。
 - ラベルの下に自前のレイヤーを入れていた場合は、`addLayer(layer, beforeId)` の `beforeId` を、移行先のスタイルのラベルのレイヤー ID に合わせる。Mapbox Standard スタイルの `slot` は使えない。
 
 ## script タグで読み込んでいる場合

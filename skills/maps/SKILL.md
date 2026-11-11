@@ -38,7 +38,7 @@ Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラ�
 ```
 
 - API キーは Geolonia のタイル・スタイルを使う場合に必要
-- 外部の style.json を指定する場合は有効な API キーは要らない。ただし URL の `geolonia-api-key` パラメータ自体は省けない（無いと `Cannot load API key.` で止まる）ので、値は `YOUR-API-KEY` のままでよい
+- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する場合は、有効な API キーは要らない（外部の style.json でも Geolonia のタイルを参照していればキーが要る）。ただし URL の `geolonia-api-key` パラメータ自体は省けない（無いと `Cannot load API key.` で止まる）ので、値は `YOUR-API-KEY` のままでよい
 - `</body>` の直前に配置する
 - 旧形式 `https://cdn.geolonia.com/v1/embed?...` はレガシー互換。新規実装では `embed/v5/embed` を使う
 

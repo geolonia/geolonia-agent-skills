@@ -29,7 +29,7 @@ Mapbox の名前で見つからない API を「MapLibre の版が古いせい�
 
 Mapbox GL JS v3 の Standard スタイル、`setConfigProperty`、style imports（`addImport` / スタイルの `imports`）、レイヤーの `slot` は MapLibre に無い。
 
-- 時間帯による明るさの切り替えなどは、Geolonia のスタイル（`geolonia/midnight` など）の切り替え（`map.setStyle()`）や、レイヤーの `setPaintProperty` で個別に書く。`setStyle()` で切り替えると自前のソースとレイヤーが消えるので、切り替えの後に足し直すか、`transformStyle` で引き継ぐ（[`api-differences.md`](api-differences.md)）。
+- 時間帯による明るさの切り替えなどは、Geolonia のスタイル（`geolonia/midnight` など）の切り替え（`map.setStyle()`）や、レイヤーの `setPaintProperty` で個別に書く。`setStyle()` で切り替えると自前のソース・レイヤー・画像が消えるので、`style.load` の後に足し直すか、ソースとレイヤーは `transformStyle` で引き継ぐ（[`api-differences.md`](api-differences.md)）。
 - `slot` で自前のレイヤーの重なり順を決めていた場合は、`map.addLayer(layer, beforeId)` の `beforeId` に、移行先のスタイルのレイヤー ID を指定する。
 
 ### 3D モデルレイヤー
