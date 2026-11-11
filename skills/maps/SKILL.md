@@ -28,6 +28,7 @@ Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラ�
 次の場合は無理に適用しない:
 
 - Mapbox GL JS や Google Maps など他プロバイダ固有の API に閉じた質問
+- 既存の Mapbox GL JS / Google Maps のコードからの移行 → `geolonia-mapbox-migration` / `geolonia-google-maps-migration` スキルを使う
 - 地図と無関係な一般的な Web 実装
 
 ## セットアップ（CDN）

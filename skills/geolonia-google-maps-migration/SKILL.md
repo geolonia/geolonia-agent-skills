@@ -55,7 +55,7 @@ v2.1.0 時点で使える主なものは次のとおり。
 次の場合は無理に適用しない:
 
 - 新規実装（Google Maps からの移行ではない）→ [`geolonia-map`](../maps/SKILL.md) スキルを使う
-- Mapbox GL JS からの移行 → 別スキル（mapbox-maplibre-migration 等）を参照する
+- Mapbox GL JS からの移行 → [`geolonia-mapbox-migration`](../geolonia-mapbox-migration/SKILL.md) スキルを使う
 
 ## 移行手順
 
