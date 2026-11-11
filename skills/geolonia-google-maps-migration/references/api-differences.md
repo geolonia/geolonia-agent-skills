@@ -165,9 +165,14 @@ new geolonia.maps.Marker({ position: results[0].geometry.location, map });
   スキルの `geocoding.md`（Open Reverse Geocoder）を使う。ただし取得できるのは都道府県・
   市区町村名までで、町名や番地は得られない。
 - `bounds` / `componentRestrictions` / `language` / `region` は受け付けるが、結果には影響しない。
-  これらで検索範囲を絞っている既存コードは、範囲外の結果を受け取りうるので、
-  `address_components` の都道府県（`administrative_area_level_1`）や市区町村（`locality`）を
+  これらで検索範囲を絞っている既存コードは、範囲外の結果を受け取りうるので、条件ごとに
   アプリ側で確かめる。
+  - `componentRestrictions.administrativeArea` / `locality`、`bounds`: `address_components` の
+    都道府県（`administrative_area_level_1`）や市区町村（`locality`）、`geometry.location` で確かめる。
+  - `componentRestrictions.country` / `region`: 結果は常に日本（`country` の `short_name` は `JP`）。
+    日本以外を指定していたコードは、そもそも移行先として使えない。
+  - `componentRestrictions.postalCode`: 結果に郵便番号（`postal_code`）は含まれないので、
+    結果だけでは確かめられない。郵便番号との照合が必要なら、別の郵便番号データを使う。
 - 住所を特定できた場合の結果は 1 件。`fulfillOnZeroResults: true` で特定できなかった場合は
   `results` が空なので、`results[0]` の前に件数を確かめる。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる
   （`日本` だけを入力した場合は国を表す `日本`）。郵便番号だけの入力は `ZERO_RESULTS` になる。
