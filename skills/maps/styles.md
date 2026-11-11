@@ -72,4 +72,4 @@ Geolonia のスタイルリポジトリはテンプレートリポジトリと�
 ## タイル・フォント
 
 - タイルスキーマ: OpenMapTiles 互換（https://github.com/geolonia/openmaptiles）
-- グリフ（フォント）: `https://glyphs.geolonia.com/fonts/{fontstack}/{range}.pbf`
+- グリフ（フォント）: `https://glyphs.geolonia.com/{fontstack}/{range}.pbf`。提供しているのは `Noto Sans CJK JP Regular` / `Bold` / `Light`、`Noto Sans Regular`、`Noto Sans Universal Regular` で、`text-font` に複数のフォントを並べると取得に失敗する

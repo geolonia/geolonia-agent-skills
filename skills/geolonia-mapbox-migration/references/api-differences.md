@@ -76,6 +76,8 @@ import { setWorkerUrl } from 'maplibre-gl';
 setWorkerUrl('/maplibre-gl-worker.mjs');
 ```
 
+`/maplibre-gl-worker.mjs` はサイトのルートを指す。アプリを `/app/` のようなサブパスに置く場合は、コピーした場所に合わせてそのパスを含める（たとえば `new URL('maplibre-gl-worker.mjs', document.baseURI).href`）。
+
 Content-Security-Policy を設定しているページで、CDN から ES モジュールとして MapLibre を読み込む場合は、worker が Blob URL から動くので `worker-src blob:` を許可する。
 
 ## `GeoloniaMap` のオプションと既定値
@@ -85,9 +87,9 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 | オプション | 既定値 | Mapbox GL JS との違い |
 | --- | --- | --- |
 | `apiKey` | なし | Geolonia のスタイルとタイルを使うときに必要。`accessToken` の代わり |
-| `style` | `'geolonia/basic-v2'` | **文字列だけ**を受け付ける。Geolonia のスタイル名、style.json の URL、相対パスのいずれか。`mapbox://` は使えない |
+| `style` | `'geolonia/basic-v2'` | 省略すると Geolonia のスタイルになるので、API キーが無いと例外になる。**文字列だけ**を受け付ける。Geolonia のスタイル名、style.json の URL、相対パスのいずれか。`mapbox://` は使えない |
 | `navigationControl` | `true` | ズームと回転のコントロールが既定で出る。消すなら `false` |
-| `geoloniaControl` | `true` | Geolonia のロゴが出る |
+| `geoloniaControl` | `true` | Geolonia のロゴが出る。v0.8.0 では `false` を渡しても消えず、表示位置だけ変えられる |
 | `gestureHandling` | `true` | スクロールできるページでは、地図を動かすのに 2 本指や修飾キーが要る。Mapbox と同じ操作にするなら `false` |
 | `loader` | `true` | 読み込み中にアニメーションを表示する |
 | `lang` | `'auto'` | ラベルの言語。`'ja'` / `'en'` / `'auto'`（ブラウザの言語に従う） |
@@ -95,18 +97,28 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 | `marker` | なし（表示しない） | `true` にすると `center` にマーカーを置く |
 | `3d` | `false` | 対応するスタイルで建物などを 3D 表示する |
 
-- `style` にスタイルのオブジェクト（`{ version: 8, sources: ..., layers: ... }`）を渡すと、コンストラクタが `style.startsWith is not a function` で例外を投げる。Mapbox のコードでオブジェクトを渡していた場合は、style.json として配信して URL を渡すか、いったん文字列のスタイルで地図を作り、`load` の後に `map.setStyle(styleObject)` で差し替える。
+- `style` にスタイルのオブジェクト（`{ version: 8, sources: ..., layers: ... }`）を渡すと、コンストラクタが `style.startsWith is not a function` で例外を投げる。Mapbox のコードでオブジェクトを渡していた場合は、style.json として配信して URL を渡すか、いったん有効なスタイルの URL（API キーを渡さないなら外部の style.json）で地図を作り、`map.setStyle(styleObject)` で差し替える。
 - `style` に `mapbox://...` を残すと、例外にはならず Geolonia のスタイル名として解釈されて取得に失敗し、地図が表示されないだけになる。棚卸しで必ず消す。
 - `container` は要素、要素の ID、CSS セレクタのどれでもよい。Mapbox と同じ `container: 'map'` で動く。
 - 帰属表示（attribution）は Geolonia の独自のコントロールに置き換わる。`attributionControl` を渡しても使われない。
 - `transformRequest` も渡せる。Geolonia のソースへのリクエストでは、API キーなどを付けた後の URL が渡される。後から `map.setTransformRequest()` で差し替えると、Geolonia 側が付けるパラメータも外れる点に注意する。
 - Geolonia の既定の見た目のマーカーが欲しい場合は、`maplibre-gl` の `Marker` の代わりに `@geolonia/maps-core` の `GeoloniaMarker` を使う。
 
+## 戻り値とコールバックの違い
+
+名前は Mapbox GL JS v1 と同じでも、MapLibre GL JS で書き方が変わったものがある。
+
+- `map.on()` は地図ではなく `Subscription` を返す。`map.on('load', a).on('click', b)` のようなチェーンは、1 行ずつに分ける（`once()` はハンドラを渡せば地図を返すのでチェーンできる。ハンドラ無しで呼ぶと Promise を返す）。
+- `map.loadImage(url, callback)` はコールバックを受け取らず、Promise を返す（`const { data } = await map.loadImage(url); map.addImage('id', data);`）。
+- GeoJSON ソースの `getClusterExpansionZoom()` / `getClusterChildren()` / `getClusterLeaves()` も Promise を返す。コールバックを渡す書き方のままだと、コールバックは呼ばれない。
+- WebGL のオプション（`preserveDrawingBuffer`、`antialias`、`failIfMajorPerformanceCaveat`）は、`MapOptions` の直下ではなく `canvasContextAttributes` の中に書く。直下に書いたままだと効かず、地図の画像の書き出しなどが動かない。
+
 ## スタイルとレイヤー
 
 - `mapbox://styles/...` の代わりに、Geolonia のスタイル（`geolonia/basic-v2`、`geolonia/gsi`、`geolonia/midnight` など。一覧は [`geolonia-map`](../../maps/SKILL.md) スキルの `styles.md`）か、自前または外部の style.json を指定する。
 - Geolonia のタイルは OpenMapTiles 互換のスキーマで、Mapbox Streets のスキーマとはレイヤー名も属性名も違う。ベースマップのソースを参照して足していたレイヤー（`source: 'composite'`、`'source-layer': 'road'` など）は、OpenMapTiles のレイヤー名（`transportation` など）に合わせて書き直す。
-- 自前の GeoJSON ソースや自前のタイルから作ったレイヤーは、ソースの URL が `mapbox://` でなければそのまま動く。
+- 自前の GeoJSON ソースや自前のタイルから作ったレイヤーは、ソースの URL が `mapbox://` でなければそのまま動く。ただし `icon-image` は移行先のスタイルのスプライトから探されるので、移行前のスプライトにしか無い画像は表示されない。同じ名前の画像を `map.addImage()` で足すか、画像名を変える。
+- `map.setStyle()` でスタイルを差し替えると、`addSource` / `addLayer` で足したソースとレイヤーは消える（`load` も再び発火しない）。差し替えの後で足し直すか、`setStyle(style, { transformStyle })` で差し替え前のソースとレイヤーを新しいスタイルに引き継ぐ。
 - ラベルの下に自前のレイヤーを入れていた場合は、`addLayer(layer, beforeId)` の `beforeId` を、移行先のスタイルのラベルのレイヤー ID に合わせる。Mapbox Standard スタイルの `slot` は使えない。
 
 ## script タグで読み込んでいる場合

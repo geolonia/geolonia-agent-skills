@@ -9,7 +9,8 @@ Mapbox の名前で見つからない API を「MapLibre の版が古いせい�
 | Mapbox GL JS | Geolonia Maps（MapLibre GL JS） | 補足 |
 | --- | --- | --- |
 | `map.setFog({...})`、スタイルの `fog` | `map.setSky({...})`、スタイルの `sky` | 1 対 1 には対応しない。プロパティ名が違い（`sky-color`、`horizon-color`、`fog-color` など）、`fog-color` などは 3D 地形（`setTerrain`）を有効にしたときだけ効く。値を移し替えたうえで見た目を確かめる |
-| `map.getFreeCameraOptions()` / `setFreeCameraOptions()` | `map.calculateCameraOptionsFromCameraLngLatAltRotation(...)` の結果を `jumpTo` / `easeTo` / `flyTo` に渡す | カメラの位置（経緯度と高さ）からカメラのオプションを計算する |
+| `map.setFreeCameraOptions()` | `map.calculateCameraOptionsFromCameraLngLatAltRotation(...)` の結果を `jumpTo` / `easeTo` / `flyTo` に渡す | カメラの位置（経緯度と高さ）と回転から、カメラのオプションを計算する |
+| `map.getFreeCameraOptions()` | 相当するものは無い | カメラ自体の位置を返す API は無い。現在のカメラを読んで書き換えるコードは、`getCenter()` / `getZoom()` / `getPitch()` / `getBearing()` で扱うように書き直す |
 | `projection: 'globe'`、`map.setProjection('globe')` | `map.setProjection({ type: 'globe' })`、スタイルの `projection` | 文字列ではなくオブジェクトで渡す |
 | `map.setTerrain({ source: 'mapbox-dem' })` | `map.setTerrain({ source, exaggeration })` | 書き方は同じ。ただし `mapbox://` の DEM は使えないので、`raster-dem` のソースを別に用意する |
 | CSS クラス `mapboxgl-*` | CSS クラス `maplibregl-*` | 接頭辞を置き換える |
@@ -22,13 +23,13 @@ Mapbox の名前で見つからない API を「MapLibre の版が古いせい�
 
 - ベースマップは Geolonia のスタイル（`geolonia/basic-v2` など）か、自前または外部の style.json に置き換える。
 - Mapbox Studio で作ったスタイルは、style.json として書き出しても、ソースが Mapbox のタイルを指していて、レイヤーも Mapbox Streets のスキーマを前提にしている。Geolonia のタイル（OpenMapTiles 互換）に載せ替えるには、ソースの URL に加えて、各レイヤーの `source-layer` とフィルタで参照する属性名を書き直す必要がある。見た目を再現するより、Geolonia のスタイルから出発して足りない表現を足すほうが早いことが多い。
-- フォントのグリフは `https://glyphs.geolonia.com/fonts/{fontstack}/{range}.pbf` を使える（[`geolonia-map`](../../maps/SKILL.md) スキルの `styles.md`）。
+- フォントのグリフは `https://glyphs.geolonia.com/{fontstack}/{range}.pbf` を使える。提供しているフォントは `Noto Sans CJK JP Regular` / `Noto Sans CJK JP Bold` / `Noto Sans CJK JP Light` / `Noto Sans Regular` / `Noto Sans Universal Regular` だけで、`text-font` に複数のフォントを並べると取得に失敗する。移行元の `text-font`（`['DIN Pro Medium', 'Arial Unicode MS Regular']` など）は、このうち 1 つに置き換える。
 
 ### Mapbox Standard スタイルとその設定 API
 
 Mapbox GL JS v3 の Standard スタイル、`setConfigProperty`、style imports（`addImport` / スタイルの `imports`）、レイヤーの `slot` は MapLibre に無い。
 
-- 時間帯による明るさの切り替えなどは、Geolonia のスタイル（`geolonia/midnight` など）の切り替え（`map.setStyle()`）や、レイヤーの `setPaintProperty` で個別に書く。
+- 時間帯による明るさの切り替えなどは、Geolonia のスタイル（`geolonia/midnight` など）の切り替え（`map.setStyle()`）や、レイヤーの `setPaintProperty` で個別に書く。`setStyle()` で切り替えると自前のソースとレイヤーが消えるので、切り替えの後に足し直すか、`transformStyle` で引き継ぐ（[`api-differences.md`](api-differences.md)）。
 - `slot` で自前のレイヤーの重なり順を決めていた場合は、`map.addLayer(layer, beforeId)` の `beforeId` に、移行先のスタイルのレイヤー ID を指定する。
 
 ### 3D モデルレイヤー
