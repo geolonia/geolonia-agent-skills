@@ -9,7 +9,7 @@
 - MapLibre GL JS は Mapbox GL JS v1.13 から分岐した。v1 時代からある API（`Map`、`Marker`、`Popup`、`addSource`、`addLayer`、イベント、式）は名前空間の置き換えだけで動く。
 - npm の `mapbox-gl` は `@geolonia/maps-core` に移す（`npm install @geolonia/maps-core maplibre-gl`）。`GeoloniaMap` は `maplibregl.Map` を継承している。ESM 専用。
 - script タグの Mapbox GL JS は CDN の `embed/v5` に移す（`geolonia.Map`）。こちらは MapLibre GL JS v5.19.0 で、worker の設定は要らない。
-- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルを使うときだけ `apiKey` を渡す。CDN の URL の `geolonia-api-key` は外部スタイルだけを使う場合も省けない（値はプレースホルダーでよい）。
+- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルかタイルを使うときだけ `apiKey` を渡す（外部の style.json でも Geolonia のタイルを参照していれば要る）。CDN の URL の `geolonia-api-key` は外部スタイルだけを使う場合も省けない（値はプレースホルダーでよい）。
 
 ## 対応表（詳細は references/）
 
@@ -35,7 +35,7 @@
 
 - `setWorkerUrl()` を書かずに npm 版を使わない。バンドラによっては、エラーも出ないまま地図が表示されなくなる。Vite は `?worker&url`、webpack や esbuild は `maplibre-gl-worker.mjs` と `maplibre-gl-shared.mjs` の 2 つをコピーする。
 - `GeoloniaMap` の既定値を Mapbox と同じだと思い込まない。ズームのコントロール、Geolonia のロゴ、ローディング表示、ジェスチャ操作（スクロールするページで 2 本指や修飾キーを求める）が既定で有効。
-- `GeoloniaMap` の `style` にオブジェクトを渡さない（例外になる）。URL にするか、有効なスタイルの URL で作ってから `map.setStyle(obj)` で渡す。`setStyle()` の後は、`style.load` を待ってから自前のソース・レイヤー・画像を足し直す。
+- `GeoloniaMap` の `style` にオブジェクトを渡さない（例外になる）。URL にするか、有効なスタイルの URL で作ってから `map.setStyle(obj)` で渡す。`setStyle()` で差し替えるときは、`setStyle()` の前に `map.once('style.load', restore)` を登録し、`{ diff: false }` を渡し、`getSource` / `getLayer` / `hasImage` で有無を確かめてから足し直す。
 - API キーを渡さないのに `style` を省略しない（既定の Geolonia のスタイルになり、例外になる）。
 - `geoloniaControl: false` でロゴが消えると考えない（v0.8.0 では位置だけ変えられる）。
 - `mapbox://` の URL を残さない（例外は出ず、地図が表示されないだけになる）。Mapbox Studio のスタイルを書き出しただけで使えると考えない（タイルのスキーマが違う）。
