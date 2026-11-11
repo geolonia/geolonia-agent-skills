@@ -1,4 +1,4 @@
-# 既知のギャップ（@geolonia/maps-suite v2.1.0 時点）
+# 既知のギャップ（@geolonia/maps-suite v2.2.0 時点）
 
 **この一覧はインストール済みの版より古いことがある。** 「無い」と書かれている機能を
 回避策で書く前に、必ず `node_modules/@geolonia/maps-suite/dist/npm/index.d.ts` を
@@ -28,6 +28,7 @@ SVG data URI で単純な記号を作る、`easeTo` に手でまとめる、と�
 | 図形・マーカーの重なり順 | `zIndex` オプション / `setZIndex()` |
 | マーカーのラベル | `label` オプション / `setLabel()`（文字列または `MarkerLabel`） |
 | ベクター記号アイコン | `icon: { path: SymbolPath.CIRCLE, ... }` |
+| 日本の住所から位置を求める | `new geolonia.maps.Geocoder().geocode({ address })` |
 | 座標・サイズの値 | `geolonia.maps.Point` / `geolonia.maps.Size`（immutable） |
 | カメラ操作 | `moveCamera()` / `setHeading()` / `setTilt()` / `disableDefaultUI` |
 | ジェスチャー・ズーム範囲 | `MapOptions` の `gestureHandling` / `minZoom` / `maxZoom` |
@@ -140,22 +141,23 @@ map.whenReady().then(() => {
 既定 UI は `disableDefaultUI: true` による一括非表示のみで、個別の出し分けはできない
 （必要なら `map.getGeoloniaMap()` に対して MapLibre のコントロールを自前で足す）。
 
-### 4. サービス系 API（Geocoder / Directions / Places）が未実装
+### 4. サービス系 API（Directions / Places）が未実装、Geocoder は日本の住所の検索のみ
 
 `importLibrary("places")` / `("geometry")` / `("drawing")` / `("visualization")` は
 名前としては認識されるが、`console.warn` を出して**空オブジェクトを返す**。
 `const { PlacesService } = await importLibrary("places")` のように書くと `undefined` が
 返ってきて、実行時に初めて壊れる。移行前の棚卸しで必ず洗い出すこと。
 
-住所から座標を引く用途であれば、Geolonia の
-[community-geocoder](https://github.com/geolonia/community-geocoder) や
-[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)
+`Geocoder` はあるが、日本の住所から位置を求める用途だけに対応する（[`api-differences.md`](api-differences.md)）。
+座標から住所を引く逆ジオコーディング（`geocode({ location })`）は `INVALID_REQUEST` で reject
+されるので、Geolonia の [open-reverse-geocoder](https://github.com/geolonia/open-reverse-geocoder)
 を別途組み合わせる（[`geolonia-map`](../../maps/SKILL.md) スキルの `geocoding.md` を参照）。
+日本以外の住所も引けない。
 
 ## デバッグ時の切り分け方
 
 アプリのコードが悪いのか、ライブラリ側の挙動なのか判断がつかない場合は、
-`node_modules/@geolonia/maps-suite/dist/maps-suite.js`（IIFE バンドル。グローバルは
-`GeoloniaMapsSuite`）を単体の HTML から読み込む最小の再現ページを作り、アプリのコードを
-介さずに再現するかどうかを先に確認する。アプリ側のロジックを疑って延々デバッグするより
+`@geolonia/maps-suite` を import するだけの 1 ファイルを esbuild や Vite でバンドルし、
+単体の HTML から読み込む最小の再現ページを作って、アプリのコードを介さずに再現するかどうかを
+先に確認する（npm パッケージは ESM 専用で、`<script>` で直接読める IIFE バンドルは含まれない）。アプリ側のロジックを疑って延々デバッグするより
 早く原因を切り分けられる。

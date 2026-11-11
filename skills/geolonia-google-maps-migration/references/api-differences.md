@@ -1,6 +1,6 @@
 # Google Maps と @geolonia/maps-suite の細かい API の違い
 
-記述は `@geolonia/maps-suite` v2.1.0 時点。**常に最新版を使い、インストール済みの版が
+記述は `@geolonia/maps-suite` v2.2.0 時点。**常に最新版を使い、インストール済みの版が
 これより新しい場合は `node_modules/@geolonia/maps-suite/dist/npm/index.d.ts` を正とする。**
 
 見た目は「ほぼ同じ」だが、そのまま移植すると壊れる細部をまとめる。「存在しない機能」は
@@ -40,7 +40,7 @@ import { geolonia } from '@geolonia/maps-suite';
 
 // geolonia.maps.Map / Marker / InfoWindow / MarkerClusterer / AdvancedMarkerElement /
 // Polyline / Polygon / Rectangle / Circle / OverlayView / LatLng / LatLngBounds /
-// Point / Size / SymbolPath / MVCObject / MVCArray / event / importLibrary が使える
+// Point / Size / SymbolPath / MVCObject / MVCArray / event / Geocoder / importLibrary が使える
 ```
 
 `geolonia.maps.importLibrary(name)` という非同期ローダーもある。
@@ -49,7 +49,8 @@ import { geolonia } from '@geolonia/maps-suite';
 | --------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `"maps"` | `Map`, `MapElement`, `OverlayView`, `Polyline`, `Polygon`, `Rectangle`, `Circle`, `InfoWindow`, `Data` |
 | `"marker"` | `Marker`, `AdvancedMarkerElement`, `MarkerClusterer` |
-| `"core"` | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event` |
+| `"core"` | `LatLng`, `LatLngBounds`, `Point`, `Size`, `MVCObject`, `event`, `MapsRequestError` |
+| `"geocoding"` | `Geocoder`, `GeocoderStatus`, `GeocoderLocationType` |
 | `"places"` / `"geometry"` / `"drawing"` / `"visualization"` | **空オブジェクト**（`console.warn` を出すだけで実装は無い） |
 
 `"places"` 等は空オブジェクトを返すため、分割代入した変数が実行時に `undefined` になる。
@@ -138,8 +139,42 @@ infoWindow.open(map, marker); // 同じ意味
 `position` / `map` / `title` / `icon` / `label` / `zIndex` が使える。`icon` は画像 URL
 （`{ url }`）とベクター記号（`{ path: SymbolPath.CIRCLE, scale, fillColor, ... }`）の両方に
 対応し、`label` は文字列か `MarkerLabel` を受け付ける（[`marker-icons.md`](marker-icons.md)）。
-`getPosition()` は `LatLng` インスタンス（`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`setPosition()` は
-`{lat, lng}` literal と `LatLng` インスタンスの両方を受け付ける。
+`getPosition()` は `LatLng` インスタンス（`.lat()`/`.lng()` メソッド）を返す点は Google Maps と同じ。`position` オプションと
+`setPosition()` は `{lat, lng}` literal と `LatLng` インスタンスの両方を受け付ける（`Geocoder` の
+`results[0].geometry.location` をそのまま渡せる）。
+
+## `Geocoder`
+
+```js
+// Before（Google Maps）
+const geocoder = new google.maps.Geocoder();
+const { results } = await geocoder.geocode({ address: '東京都台東区上野公園7-7' });
+
+// After（@geolonia/maps-suite）
+const geocoder = new geolonia.maps.Geocoder();
+const { results } = await geocoder.geocode({ address: '東京都台東区上野公園7-7' });
+map.fitBounds(results[0].geometry.viewport);
+new geolonia.maps.Marker({ position: results[0].geometry.location, map });
+```
+
+書き方は同じだが、中身は日本の住所専用のジオコーダー（住所の解釈は
+[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)）。
+
+- 対応するのは `address` による検索だけ。`location`（逆ジオコーディング）や `placeId` を渡すと
+  `INVALID_REQUEST` で reject される。逆ジオコーディングは [`geolonia-map`](../../maps/SKILL.md)
+  スキルの `geocoding.md`（Open Reverse Geocoder）を使う。
+- `bounds` / `componentRestrictions` / `language` / `region` は受け付けるが、結果には影響しない。
+- 結果は常に 1 件。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる。
+  `place_id` は常に空文字列。
+- `geometry.location_type` は、住居表示住所か地番の位置まで特定できたときが `ROOFTOP`、
+  町字・市区町村・都道府県の代表点のときが `APPROXIMATE`。入力より粗い位置しか得られなかった
+  場合や、建物名などが残った場合は `partial_match: true` になる。
+- 住所を特定できないと `code` が `ZERO_RESULTS` の `MapsRequestError` で reject される。
+  reject させずに空の `results` を受け取りたいときは `fulfillOnZeroResults: true` を渡す。
+  コールバック形式（`geocode(request, (results, status) => { ... })`）も使える。
+- 住所データは検索のたびに `https://japanese-addresses-v2.geoloniamaps.com` から必要な分だけ
+  取得するため、ある都道府県や市区町村で最初の検索は 2 回目以降より遅い。Content-Security-Policy を
+  設定しているページでは、この origin を `connect-src` に足す。
 
 ## `Polyline` / `Polygon` / `Rectangle` / `Circle`
 

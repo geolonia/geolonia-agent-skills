@@ -1,6 +1,6 @@
 # Geolonia Google Maps 移行 クイックリファレンス（エージェント向け）
 
-`SKILL.md` の凝縮版。記述は `@geolonia/maps-suite` **v2.1.0** 時点。詳細は同ディレクトリの
+`SKILL.md` の凝縮版。記述は `@geolonia/maps-suite` **v2.2.0** 時点。詳細は同ディレクトリの
 `references/` を参照する。
 
 **常に最新版を使う。** インストール済みの版がここより新しい場合は、この文書ではなく
@@ -39,7 +39,8 @@
 | `polygon.addListener('click', ...)` | 同じ書き方でよい（`e.latLng` / `e.domEvent`）。図形上のクリックで地図の `click` は発火しない |
 | `map.data.addListener('click', ...)` | **発火しない**。`map.getGeoloniaMap()` で自前レイヤーを描いて `impl.on('click', layerId, ...)` |
 | `map.moveCamera({...})` / `setHeading()` | 同名で使える（`setTilt()` も） |
-| `new google.maps.Geocoder()` など | **存在しない**。community-geocoder 等を別途組み合わせる |
+| `new google.maps.Geocoder()` | `new geolonia.maps.Geocoder()`。日本の住所 → 位置のみ（逆ジオコーディングは無い）。結果は 1 件 |
+| `DirectionsService` / `PlacesService` | **存在しない**（`importLibrary("places")` は空オブジェクト） |
 | `map.data.addGeoJson(...)` | 同名で使える（`geolonia.maps.Data`。`setStyle` / `toGeoJson` も） |
 
 ## Do not（やってはいけない）
@@ -50,6 +51,8 @@
   渡さない（存在しないフィールド）。既定 UI を消すなら `disableDefaultUI: true` で一括指定する。
   `gestureHandling` / `minZoom` / `maxZoom` は使える。
 - `require()` で読み込まない（ESM 専用）。`maplibregl.setWorkerUrl()` も書かない（worker は同梱）。
+- `Geocoder` に `location`（逆ジオコーディング）や `placeId` を渡さない。`INVALID_REQUEST` で reject される。
+  CSP のあるページでは `https://japanese-addresses-v2.geoloniamaps.com` を `connect-src` に足す。
 - `center` / `zoom` の指定漏れを放置しない。既定値は `{ lat: 0, lng: 0 }` / `zoom: 0`（全球）。
   Google Maps と違い、省略してもエラーにならず静かに全球表示になる。
 - 平面表示前提の UI で `threeDimensional` を省略しない。既定で 3D 建物が **ON**。
