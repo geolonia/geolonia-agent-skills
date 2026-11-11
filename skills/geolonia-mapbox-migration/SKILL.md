@@ -28,7 +28,7 @@ MapLibre GL JS は Mapbox GL JS v1.13（BSD ライセンス最後の版）から
 | --- | --- |
 | npm の `mapbox-gl` を `import` している | `@geolonia/maps-core`（`GeoloniaMap` は `maplibregl.Map` を継承）。このスキルの本線 |
 | `<script src="https://api.mapbox.com/mapbox-gl-js/...">` で読み込んでいる | CDN の `embed/v5`（`geolonia.Map`）。差分は [`references/api-differences.md`](references/api-differences.md) の「script タグで読み込んでいる場合」 |
-| `react-map-gl` を使っている | `@geolonia/maps-react` があるが、`react-map-gl` と API 互換ではない（たとえば `<Map>` は `initialViewState` ではなく `center` / `zoom` を受け取り、`<Marker>` の座標は `longitude` / `latitude` ではなく `lng` / `lat`）。対応表はこのスキルの範囲外なので、パッケージの README を読んで書き換える |
+| `react-map-gl` を使っている | `@geolonia/maps-react` があるが、`react-map-gl` と API 互換ではない（たとえば `<Map>` は `initialViewState` ではなく `center` / `zoom` を受け取り、`<Marker>` の座標は `longitude` / `latitude` ではなく `lng` / `lat`）。対応表はこのスキルの範囲外なので、パッケージの README を読んで書き換える。worker の設定（下の手順 4）はこちらでも必要 |
 
 ## いつ使うか（When to Use This Skill）
 
@@ -54,7 +54,7 @@ MapLibre GL JS は Mapbox GL JS v1.13（BSD ライセンス最後の版）から
 4. **worker の設定**: `maplibre-gl` v6 は worker を実際の URL から読み込むので、多くのバンドラでは最初の地図を作る前に `setWorkerUrl()` が必要。これを忘れると、エラーも出ずに地図がいつまでも表示されない。バンドラごとの書き方は [`references/api-differences.md`](references/api-differences.md)。
 5. **地図の初期化**: `new mapboxgl.Map({...})` を `new GeoloniaMap({...})` に置き換え、`mapboxgl.accessToken = ...` の行を消す。Geolonia のスタイル（`'geolonia/basic-v2'` など）を使う場合は `apiKey` を渡す。外部の style.json を使う場合は API キーは要らない。API キーは [app.geolonia.com](https://app.geolonia.com/) のコンソールで発行する。
 6. **既定値の違いを確認する**: `GeoloniaMap` は既定でズームのコントロール、Geolonia のロゴ、ローディング表示、スクロールするページでのジェスチャ操作（地図を動かすのに 2 本指や修飾キーを求める）が有効。Mapbox と同じ挙動にしたい場合は明示的に `false` を渡す（[`references/api-differences.md`](references/api-differences.md)）。
-7. **スタイルの置き換え**: `mapbox://styles/...` は使えない。Geolonia のスタイル（`geolonia/basic-v2` など）か、自前または外部の style.json に置き換える。Mapbox のベクトルタイル（Mapbox Streets）と Geolonia のタイル（OpenMapTiles 互換）はスキーマが違うので、ベースマップの `source-layer`（`road` や `poi_label` など）を参照している自前のレイヤーやフィルタは書き直す。自前の GeoJSON やタイルから作ったレイヤーはそのまま動く。
+7. **スタイルの置き換え**: `mapbox://styles/...` は使えない（残すと例外は出ずに地図が表示されないだけになる）。`style` は文字列しか受け付けないので、スタイルをオブジェクトで渡していた場合は、URL にするか `load` の後に `map.setStyle()` で渡す。Geolonia のスタイル（`geolonia/basic-v2` など）か、自前または外部の style.json に置き換える。Mapbox のベクトルタイル（Mapbox Streets）と Geolonia のタイル（OpenMapTiles 互換）はスキーマが違うので、ベースマップの `source-layer`（`road` や `poi_label` など）を参照している自前のレイヤーやフィルタは書き直す。自前の GeoJSON やタイルから作ったレイヤーはそのまま動く。
 8. **クラスと名前空間の置き換え**: 残りの `mapboxgl.X` を `maplibre-gl` からの import に置き換える。マーカーは `maplibre-gl` の `Marker` のままでもよく、Geolonia の既定の見た目にしたい場合は `GeoloniaMarker` を使う。CSS で `.mapboxgl-ctrl` などを指定していたら `.maplibregl-ctrl` に直す。
 9. **分岐後の Mapbox 固有 API を書き換える**: `setFog` は `setSky`、FreeCamera は `calculateCameraOptionsFromCameraLngLatAltRotation()` と `jumpTo` / `easeTo` / `flyTo` に置き換える。Mapbox Standard スタイルの設定 API や 3D モデルレイヤーには対応するものが無い（[`references/known-gaps.md`](references/known-gaps.md)）。
 10. **Mapbox のサービスとプラグインを置き換える**: 日本の住所のジオコーディングは [`geolonia-map`](../maps/SKILL.md) スキルの `geocoding.md` を使う。経路検索（Directions）は Geolonia Maps に無いので、別のサービスを組み合わせる（[`references/known-gaps.md`](references/known-gaps.md)）。

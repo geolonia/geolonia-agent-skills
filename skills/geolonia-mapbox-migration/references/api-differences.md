@@ -34,6 +34,7 @@ import '@geolonia/maps-core/css';
 import { Marker, Popup, ScaleControl } from 'maplibre-gl';
 import { GeoloniaMap } from '@geolonia/maps-core';
 
+// この前に setWorkerUrl() が必要（下の「worker の設定」を参照）
 const map = new GeoloniaMap({
   container: 'map',
   apiKey: import.meta.env.VITE_GEOLONIA_API_KEY, // Geolonia のスタイルを使う場合のみ
@@ -54,7 +55,7 @@ map.addControl(new ScaleControl());
 
 `maplibre-gl` v6 は worker を `import.meta.url` を基準にした実際の URL から読み込む。多くのバンドラはこのファイルを出力に含めないので、最初の地図を作る前に `setWorkerUrl()` を一度呼ぶ。忘れると、例外もコンソールのエラーも無いまま地図が表示されない。
 
-worker は 2 つのファイルでできている。`maplibre-gl-worker.mjs` は、同じディレクトリの `maplibre-gl-shared.mjs` を import するだけの小さなファイル。そのため、ファイルをそのままコピーする方式では 2 つとも出力に置く必要がある。
+worker は `maplibre-gl-worker.mjs` と `maplibre-gl-shared.mjs` の 2 つのファイルでできている。`maplibre-gl` の版によっては、`maplibre-gl-worker.mjs` が同じディレクトリの `maplibre-gl-shared.mjs` を import する（6.17.0 では `maplibre-gl-worker.mjs` だけで動き、`maplibre-gl-shared.mjs` は空）。ファイルをそのままコピーする方式では、版によらず動くように 2 つとも出力に置く。
 
 Vite は worker 用の処理で 1 つのファイルにまとめてくれる（`?worker&url` が必要。`?url` だけでは足りない）。
 
@@ -65,7 +66,7 @@ import { setWorkerUrl } from 'maplibre-gl';
 setWorkerUrl(workerUrl);
 ```
 
-webpack や esbuild では 2 つのファイルを出力先にコピーし、そのコピーを指す。webpack で `new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url)` と書くと、`maplibre-gl-shared.mjs` が出力されず worker の読み込みに失敗する。
+webpack や esbuild では 2 つのファイルを出力先にコピーし、そのコピーを指す（esbuild と `maplibre-gl` 6.17.0 の組み合わせで動くことを確かめてある）。webpack で `new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url)` と書くと、`maplibre-gl-shared.mjs` が出力されず worker の読み込みに失敗する。
 
 ```js
 // webpack なら copy-webpack-plugin で、esbuild ならビルドの後に cp で、
@@ -84,7 +85,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 | オプション | 既定値 | Mapbox GL JS との違い |
 | --- | --- | --- |
 | `apiKey` | なし | Geolonia のスタイルとタイルを使うときに必要。`accessToken` の代わり |
-| `style` | `'geolonia/basic-v2'` | Geolonia のスタイル名、style.json の URL、相対パスのいずれか。`mapbox://` は使えない |
+| `style` | `'geolonia/basic-v2'` | **文字列だけ**を受け付ける。Geolonia のスタイル名、style.json の URL、相対パスのいずれか。`mapbox://` は使えない |
 | `navigationControl` | `true` | ズームと回転のコントロールが既定で出る。消すなら `false` |
 | `geoloniaControl` | `true` | Geolonia のロゴが出る |
 | `gestureHandling` | `true` | スクロールできるページでは、地図を動かすのに 2 本指や修飾キーが要る。Mapbox と同じ操作にするなら `false` |
@@ -94,6 +95,8 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 | `marker` | なし（表示しない） | `true` にすると `center` にマーカーを置く |
 | `3d` | `false` | 対応するスタイルで建物などを 3D 表示する |
 
+- `style` にスタイルのオブジェクト（`{ version: 8, sources: ..., layers: ... }`）を渡すと、コンストラクタが `style.startsWith is not a function` で例外を投げる。Mapbox のコードでオブジェクトを渡していた場合は、style.json として配信して URL を渡すか、いったん文字列のスタイルで地図を作り、`load` の後に `map.setStyle(styleObject)` で差し替える。
+- `style` に `mapbox://...` を残すと、例外にはならず Geolonia のスタイル名として解釈されて取得に失敗し、地図が表示されないだけになる。棚卸しで必ず消す。
 - `container` は要素、要素の ID、CSS セレクタのどれでもよい。Mapbox と同じ `container: 'map'` で動く。
 - 帰属表示（attribution）は Geolonia の独自のコントロールに置き換わる。`attributionControl` を渡しても使われない。
 - `transformRequest` も渡せる。Geolonia のソースへのリクエストでは、API キーなどを付けた後の URL が渡される。後から `map.setTransformRequest()` で差し替えると、Geolonia 側が付けるパラメータも外れる点に注意する。
@@ -108,7 +111,10 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 
 ## script タグで読み込んでいる場合
 
-`<script src="https://api.mapbox.com/mapbox-gl-js/...">` で読み込んでいるページは、CDN の `embed/v5` に置き換える。グローバル変数は `mapboxgl` ではなく `geolonia` になり、MapLibre GL JS のクラスが `geolonia.Map` / `geolonia.Marker` / `geolonia.Popup` のように使える。
+`<script src="https://api.mapbox.com/mapbox-gl-js/...">` で読み込んでいるページは、CDN の `embed/v5` に置き換える。MapLibre GL JS のクラスがグローバル変数 `geolonia` から `geolonia.Map` / `geolonia.Marker` / `geolonia.Popup` のように使える。
+
+- embed は同じものを `window.maplibregl` と `window.mapboxgl` にも入れるので、`mapboxgl.Map` と書いたままでも動く。ただし移行後のコードでは `geolonia.*` に書き換えておく。
+- `geolonia.Map` と `geolonia.Marker` は Geolonia の拡張クラスで、マーカーは Geolonia の既定の見た目になる（MapLibre の素の `Marker` とは見た目が違う）。
 
 ```html
 <!-- Before（Mapbox GL JS） -->

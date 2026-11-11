@@ -31,7 +31,8 @@
 
 - `setWorkerUrl()` を書かずに npm 版を使わない。バンドラによっては、エラーも出ないまま地図が表示されなくなる。Vite は `?worker&url`、webpack や esbuild は `maplibre-gl-worker.mjs` と `maplibre-gl-shared.mjs` の 2 つをコピーする。
 - `GeoloniaMap` の既定値を Mapbox と同じだと思い込まない。ズームのコントロール、Geolonia のロゴ、ローディング表示、ジェスチャ操作（スクロールするページで 2 本指や修飾キーを求める）が既定で有効。
-- `mapbox://` の URL を残さない。Mapbox Studio のスタイルを書き出しただけで使えると考えない（タイルのスキーマが違う）。
+- `GeoloniaMap` の `style` にオブジェクトを渡さない（例外になる）。URL にするか、`load` の後に `map.setStyle(obj)` で渡す。
+- `mapbox://` の URL を残さない（例外は出ず、地図が表示されないだけになる）。Mapbox Studio のスタイルを書き出しただけで使えると考えない（タイルのスキーマが違う）。
 - `setFog`、`setConfigProperty`、`addImport`、`slot`、`type: 'model'` を MapLibre の版を上げれば使えると考えない。名前が違うか、対応するものが無い。
 - CDN の `embed/v5` で MapLibre v6 の API を使わない（v5.19.0 が同梱されている）。CDN の URL から `geolonia-api-key` を省かない（外部スタイルだけでも必要）。
 - MapLibre の API を Geolonia 用に書き換えようとしない。`GeoloniaMap` は `maplibregl.Map` そのもののメソッドとイベントを持つ。

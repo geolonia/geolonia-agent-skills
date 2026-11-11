@@ -8,7 +8,7 @@ Mapbox の名前で見つからない API を「MapLibre の版が古いせい�
 
 | Mapbox GL JS | Geolonia Maps（MapLibre GL JS） | 補足 |
 | --- | --- | --- |
-| `map.setFog({...})`、スタイルの `fog` | `map.setSky({...})`、スタイルの `sky` | プロパティ名が違う（`sky-color`、`horizon-color`、`fog-color`、`fog-ground-blend` など）。値は移し替えて見た目を確かめる |
+| `map.setFog({...})`、スタイルの `fog` | `map.setSky({...})`、スタイルの `sky` | 1 対 1 には対応しない。プロパティ名が違い（`sky-color`、`horizon-color`、`fog-color` など）、`fog-color` などは 3D 地形（`setTerrain`）を有効にしたときだけ効く。値を移し替えたうえで見た目を確かめる |
 | `map.getFreeCameraOptions()` / `setFreeCameraOptions()` | `map.calculateCameraOptionsFromCameraLngLatAltRotation(...)` の結果を `jumpTo` / `easeTo` / `flyTo` に渡す | カメラの位置（経緯度と高さ）からカメラのオプションを計算する |
 | `projection: 'globe'`、`map.setProjection('globe')` | `map.setProjection({ type: 'globe' })`、スタイルの `projection` | 文字列ではなくオブジェクトで渡す |
 | `map.setTerrain({ source: 'mapbox-dem' })` | `map.setTerrain({ source, exaggeration })` | 書き方は同じ。ただし `mapbox://` の DEM は使えないので、`raster-dem` のソースを別に用意する |

@@ -106,14 +106,14 @@ skills/
 │   ├── geocoding.md           # ジオコーディング（住所↔座標変換・住所正規化）
 │   ├── styles.md              # マップスタイル一覧とカスタマイズ
 │   └── examples.md            # よくあるパターンのコード例
-└── geolonia-google-maps-migration/
-    ├── SKILL.md               # メインスキル定義（移行手順 + 振り返り）
-    ├── AGENTS.md              # 凝縮版クイックリファレンス
-    └── references/
-        ├── known-gaps.md      # maps-suite に無い機能と回避策
-        ├── api-differences.md # 細部が異なる API（InfoWindow.open() など）
-        ├── marker-icons.md    # マーカーアイコン（SymbolPath / 画像 URL）
-        └── shapes.md          # 図形（Polyline/Polygon/Rectangle/Circle）の移行
+├── geolonia-google-maps-migration/
+│   ├── SKILL.md               # メインスキル定義（移行手順 + 振り返り）
+│   ├── AGENTS.md              # 凝縮版クイックリファレンス
+│   └── references/
+│       ├── known-gaps.md      # maps-suite に無い機能と回避策
+│       ├── api-differences.md # 細部が異なる API（InfoWindow.open() など）
+│       ├── marker-icons.md    # マーカーアイコン（SymbolPath / 画像 URL）
+│       └── shapes.md          # 図形（Polyline/Polygon/Rectangle/Circle）の移行
 └── geolonia-mapbox-migration/
     ├── SKILL.md               # メインスキル定義（移行先の選び方 + 移行手順）
     ├── AGENTS.md              # 凝縮版クイックリファレンス
