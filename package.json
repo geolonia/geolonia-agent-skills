@@ -5,6 +5,9 @@
   "private": true,
   "license": "MIT",
   "repository": "https://github.com/geolonia/geolonia-agent-skills",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
     "check": "npm run format:check && npm run spellcheck && npm run lint:markdown && npm run validate:skills",
     "format:check": "prettier --check \"**/*.{json,yml,yaml}\"",
@@ -16,7 +19,7 @@
     "postinstall": "node scripts/setup-hooks.js"
   },
   "devDependencies": {
-    "cspell": "^8.17.0",
+    "cspell": "^10.4.1",
     "markdownlint-cli2": "^0.24.0",
     "prettier": "^3.4.2"
   }
