@@ -102,7 +102,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 - `container` は要素、要素の ID、CSS セレクタのどれでもよい。Mapbox と同じ `container: 'map'` で動く。
 - 帰属表示（attribution）は Geolonia の独自のコントロールに置き換わる。`attributionControl` を渡しても使われない。
 - `transformRequest` も渡せる。Geolonia のソースへのリクエストでは、API キーなどを付けた後の URL が渡される。後から `map.setTransformRequest()` で差し替えると、Geolonia 側が付けるパラメータも外れる点に注意する。
-- Geolonia の既定の見た目のマーカーが欲しい場合は、`maplibre-gl` の `Marker` の代わりに `@geolonia/maps-core` の `GeoloniaMarker` を使う。
+- Geolonia の既定の見た目のマーカーが欲しい場合は、`maplibre-gl` の `Marker` の代わりに `@geolonia/maps-core` の `GeoloniaMarker` を使う（CDN 版では `geolonia.Marker`）。
 
 ## 戻り値とコールバックの違い
 
@@ -183,9 +183,9 @@ function switchStyle(nextStyle) {
 </script>
 ```
 
-- API キーは `<script>` の URL の `geolonia-api-key` で渡す。Geolonia のスタイルもタイルも参照しない外部の style.json だけを使う場合は省いてもよい（地図は表示され、コンソールに `[Geolonia] Missing API key.` と出る）。
+- API キーは `<script>` の URL の `geolonia-api-key` で渡す。Geolonia のスタイルもタイルも参照しない外部の style.json だけを使う場合も、パラメータは残す（値は `YOUR-API-KEY` のままでよい）。省くと、別オリジンの iframe の中では `class="geolonia"` の地図が描画されなくなる。
 - CSS は embed に同梱されているので、`<link>` は要らない。
-- `embed/v6` が同梱しているのは MapLibre GL JS v6 系（v6.0.0 では 6.16.0）で、内部で `@geolonia/maps-core` を使っている。このページの「`GeoloniaMap` のオプションと既定値」「戻り値とコールバックの違い」「スタイルとレイヤー」はそのまま当てはまる。違うのは読み込み方だけで、worker は同梱されているので `setWorkerUrl()` は要らない。Content-Security-Policy を設定しているページでは、worker が `blob:` URL から起動するので `worker-src blob:` を許可する。
+- `embed/v6` が同梱しているのは MapLibre GL JS v6 系（v6.0.0 では 6.16.0）で、内部で `@geolonia/maps-core` を使っている。このページの「`GeoloniaMap` のオプションと既定値」「戻り値とコールバックの違い」「スタイルとレイヤー」は、クラスを `geolonia.*` から使う点（`GeoloniaMarker` は `geolonia.Marker`）を除いてそのまま当てはまる。npm 版との主な違いは、worker が同梱されていて `setWorkerUrl()` が要らないこと、API キーを URL から読むこと、`class="geolonia"` の要素を自動で地図に変換すること、`window.maplibregl` / `window.mapboxgl` を上書きすること。Content-Security-Policy を設定しているページでは、worker が `blob:` URL から起動するので `worker-src blob:` を許可する。
 - 旧版の `embed/v5`（MapLibre GL JS v5 系を同梱）も配信は続いているが、新しく移すコードでは使わない。
 - `class="geolonia"` を持つ要素は、embed が自動で地図に変換する。移行先のページで別の用途にこのクラス名を使っていないか確かめる。
 - 詳しい使い方は [`geolonia-map`](../../maps/SKILL.md) スキルの `javascript-api.md` と `embed-api.md`。

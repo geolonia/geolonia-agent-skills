@@ -68,7 +68,7 @@ MapLibre GL JS は Mapbox GL JS v1.13（BSD ライセンス最後の版）から
 
 - 互換なのは v1 時代からある API。Mapbox GL JS v2 / v3 で入った API ほど、そのままでは動かない。「名前空間を置き換えれば終わり」と見積もる前に、手順 1 の棚卸しをする。
 - Mapbox の名前で見つからない API を「MapLibre の版が古いせい」と考えて版を上げても解決しない。MapLibre 側の名前を調べる（`setFog` → `setSky` など）。
-- npm の `@geolonia/maps-core` も CDN の `embed/v6` も、MapLibre GL JS v6 系の上で動く（`embed/v6` は内部で `@geolonia/maps-core` を使っている）。違うのは読み込み方で、npm 版はバンドラと worker の設定が要り、CDN 版は `<script>` 1 行で worker も同梱されている。
+- npm の `@geolonia/maps-core` も CDN の `embed/v6` も、MapLibre GL JS v6 系の上で動く（`embed/v6` は内部で `@geolonia/maps-core` を使っている）。主な違いは読み込み方で、npm 版はバンドラと worker の設定が要り、CDN 版は `<script>` 1 行で worker も同梱されている（CDN 版は `class="geolonia"` の自動変換なども加わる。[`references/api-differences.md`](references/api-differences.md) の「script タグで読み込んでいる場合」）。
 - `GeoloniaMap` は `maplibregl.Map` を継承しているので、`map.on('load', ...)` / `addSource` / `addLayer` / `queryRenderedFeatures` などはそのまま使える。Geolonia 用に書き換えようとしない。
 - API キーを公開リポジトリやコミットに直書きしない。
 
