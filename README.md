@@ -35,11 +35,11 @@ MapLibre GL JS ベースのライブラリ）への移行を支援します。
 
 Mapbox GL JS から Geolonia Maps への移行を支援します。MapLibre GL JS は Mapbox GL JS v1.13 から分岐したライブラリなので、v1 時代からある API は名前空間の置き換えだけで動きます。このスキルは、置き換えだけでは済まない部分を扱います。
 
-- **移行先**: npm の `mapbox-gl` は `@geolonia/maps-core`、script タグの Mapbox GL JS は CDN の `embed/v5`
+- **移行先**: npm の `mapbox-gl` は `@geolonia/maps-core`、script タグの Mapbox GL JS は CDN の `embed/v6`
 - **移行手順**: 棚卸し、インストール、import と CSS、worker の設定、地図の初期化、既定値の確認、スタイルの置き換え、Mapbox 固有 API の書き換え、動作確認
 - **Mapbox 固有の機能**: `mapbox://` のスタイルとタイルのスキーマ、`setFog`・FreeCamera などの名前の違い、Standard スタイルの設定 API や 3D モデルレイヤーなど対応するものが無い機能、Mapbox の REST API とプラグイン
 
-記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v5`（MapLibre GL JS v5.19.0）の時点です。
+記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0）の時点です。
 
 ## 要件
 
