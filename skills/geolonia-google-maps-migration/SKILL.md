@@ -18,7 +18,7 @@ description: >
 MapLibre GL JS ベースのライブラリ。既存の Google Maps 実装を「限りなくコードの変更なしで」
 Geolonia Maps に移行することを目的としている。
 
-**このスキルの記述は `@geolonia/maps-suite` v2.1.0 時点のもの。**
+**このスキルの記述は `@geolonia/maps-suite` v2.2.0 時点のもの。**
 
 **常に最新版を使うこと。** 互換の範囲はリリースごとに広がるため、古い版を指定すると、
 いまは公式 API がある機能に対して不要な回避策を書くことになる。バージョンを固定する
@@ -29,7 +29,7 @@ Geolonia Maps に移行することを目的としている。
 「無い」と書かれている機能が実際には追加されていることがある。回避策を書く前に、まず
 その名前で型定義を検索する。
 
-v2.1.0 時点で使える主なものは次のとおり。
+v2.2.0 時点で使える主なものは次のとおり。
 
 - 図形クラス（`Polyline` / `Polygon` / `Rectangle` / `Circle`）。`click` イベントと
   `zIndex` にも対応
@@ -39,10 +39,11 @@ v2.1.0 時点で使える主なものは次のとおり。
 - GeoJSON レイヤー（`map.data`。`google.maps.Data` に相当）
 - `MapOptions` の `gestureHandling` / `minZoom` / `maxZoom`
 - `InfoWindow.open({ map, anchor })`（Google Maps と同じオプションオブジェクト形式）
+- 日本の住所から位置を求める `Geocoder`（`geocoder.geocode({ address })`）
 - 土台へアクセスする公開 API（`map.getGeoloniaMap()` / `map.whenReady()` /
   `marker.getMapLibreMarker()`）
 
-一方で Places/Directions/Geocoder といったサービス系 API、`draggable`/`editable`、
+一方で Places/Directions といったサービス系 API、逆ジオコーディング、`draggable`/`editable`、
 `mapTypeId` などは未実装。**移行を始める前に、対象コードが何を
 使っているか棚卸しし、このスキルの「既知のギャップ」を必ず確認すること。**
 
@@ -60,9 +61,10 @@ v2.1.0 時点で使える主なものは次のとおり。
 ## 移行手順
 
 1. **棚卸し（最初にやる）**: 対象コードが使っている Google Maps API を洗い出す。
-   `Geocoder`/`DirectionsService`/`Places`、`draggable`/`editable`、
+   `DirectionsService`/`Places`、`draggable`/`editable`、
    `mapTypeId`/`restriction` 等の `MapOptions` は maps-suite に **存在しない**ため、
-   見つかった場合は先に回避策を確認しておく
+   見つかった場合は先に回避策を確認しておく。`Geocoder` は日本の住所を引く用途なら
+   そのまま使えるが、逆ジオコーディング（`location` 指定）や日本以外の住所には使えない
    （[`references/known-gaps.md`](references/known-gaps.md)）。
 2. **インストール**: `npm install @geolonia/maps-suite maplibre-gl`
    （`maplibre-gl` は peer dependency）。**版は指定せず最新を入れる。**
@@ -93,10 +95,19 @@ v2.1.0 時点で使える主なものは次のとおり。
 9. **GeoJSON**: `google.maps.Data` を使っているコードは `map.data` に移せる。
    `map.data.addGeoJson(featureCollection)` で追加し、`map.data.setStyle({ ... })` で
    見た目を指定する。スタイルは関数も渡せるので、フィーチャごとの出し分けもできる。
-10. **カメラ操作**: `panTo()` の直後の `setZoom()` は正しく動く（同一の同期処理内の
+10. **ジオコーディング**: `new google.maps.Geocoder()` の `geocode({ address })` は
+    `geolonia.maps.Geocoder` にそのまま移せる。Promise 形式とコールバック形式のどちらも動く。
+    ただし `componentRestrictions` / `bounds` / `region` は受け付けるだけで結果を絞らないので、
+    これらで検索範囲を絞っている既存コードは、結果の都道府県・市区町村をアプリ側で確かめる。
+    住所を特定できた場合の結果は 1 件で、`formatted_address` は（`日本` だけを入力した場合を除き）
+    `日本、` で始まる。`fulfillOnZeroResults: true` では `results` が空になりうるので、
+    `results[0]` の前に件数を確かめる。Content-Security-Policy を
+    設定しているページでは住所データ API の origin を `connect-src` に足す
+    （[`references/api-differences.md`](references/api-differences.md)）。
+11. **カメラ操作**: `panTo()` の直後の `setZoom()` は正しく動く（同一の同期処理内の
     変更は 1 回のカメラ操作にまとめられる）。`await` を挟むとまとまらないので、その場合は
     `moveCamera({ center, zoom })` を使う（[`references/known-gaps.md`](references/known-gaps.md)）。
-11. **ビルド・動作確認**: `npm run build`/`npm run dev` の後、ブラウザで実際に地図・マーカー・
+12. **ビルド・動作確認**: `npm run build`/`npm run dev` の後、ブラウザで実際に地図・マーカー・
     ポップアップ・クラスタリング・図形の動作を確認する。プレースホルダー API キーでも
     ベースタイルは表示される（フォントグリフの取得のみ 403 になるが無害）ため、実キーが
     無くても UI ロジックの確認は進められる。ただし本番投入前には実キーでの最終確認が必要。
@@ -116,12 +127,12 @@ v2.1.0 時点で使える主なものは次のとおり。
   なお `getGeoloniaMap()` 経由で center / zoom / tilt / heading を直接変更した場合の動作は
   保証されない。カメラ操作は maps-suite の API を使う。
 - ライブラリ由来のバグか疑わしい挙動に遭遇したら、アプリのコードから切り離した最小の
-  再現用 HTML（`dist/maps-suite.js` の IIFE バンドル + 簡単な `http-server`）を先に書いて
-  確認する方が早い。
+  再現用ページ（`@geolonia/maps-suite` を import する 1 ファイルを esbuild や Vite でバンドルし、
+  簡単な HTTP サーバーで開く）を先に書いて確認する方が早い。
 - 共有のデモ用 Geolonia API キーは無い。実キーが必要な場面とプレースホルダーで
   十分な場面を区別すると、キー発行待ちで作業を止めずに済む。
 
-## 既知のギャップ（v2.1.0 時点）
+## 既知のギャップ（v2.2.0 時点）
 
 詳細と回避策は [`references/known-gaps.md`](references/known-gaps.md)。
 **より新しい版を使っている場合は、ここに「無い」と書かれていても型定義を先に確認すること。**
@@ -130,7 +141,7 @@ v2.1.0 時点で使える主なものは次のとおり。
 - `map.data` のフィーチャが `click` イベントを発火しない
 - `InfoWindowOptions` は `content` のみ（`maxWidth` / `pixelOffset` / `position` が無い）
 - `MapOptions` に `mapTypeId` / `restriction` / コントロール個別指定が無い
-- Geocoder / Directions / Places など サービス系 API が未実装
+- Directions / Places など サービス系 API が未実装。`Geocoder` は日本の住所から位置を求める用途だけ（逆ジオコーディングは無い）
   （`importLibrary("places")` は警告を出して空オブジェクトを返す）
 
 ## リファレンス
