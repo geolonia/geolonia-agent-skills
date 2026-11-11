@@ -131,42 +131,33 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 
 あわせて次の点に気をつける。
 
-- 自前の画像の ID は、スプライトの画像と重ならない名前にする。`style.load` はスプライトの読み込みより先に発火するので、同じ ID の画像がスプライトにあると、足した画像が後からスプライトの画像で上書きされる。
+- 自前のソース・レイヤー・画像の ID は、切り替え先のスタイルと重ならない名前にする（`app-` などの接頭辞を付ける）。同じ ID のソースやレイヤーが切り替え先にあると、有無の確認で足し直しが飛ばされる。画像は、`style.load` がスプライトの読み込みより先に発火するので、同じ ID の画像がスプライトにあると後から上書きされる。
 - `setData()` でソースのデータを更新しているなら、最新のデータをアプリ側の変数に持っておき、足し直すときはそれを使う。
-- URL のスタイルの取得に失敗すると、`style.load` は発火せず、元のスタイルも消えた状態になる。`error` はタイルの取得失敗などでも発火するので、`e.error.url` が切り替え先のスタイルの URL と一致するものだけを失敗として扱い、リスナーを外したうえで、同じ手順で元のスタイルに戻す（戻した先でも自前のレイヤーを足し直すため）。戻すのは 1 回だけにし、元のスタイルでも失敗したら利用者に知らせる。なお、この判別は `transformRequest` でスタイルの URL を書き換えている場合と、取得はできたが JSON として解析できなかった場合（`url` が付かない）には効かない。そうした失敗まで拾う必要があるなら、スタイルの JSON を先に `fetch` して検証してから `setStyle()` にオブジェクトで渡す。
+- URL を `setStyle()` に渡すと、取得に失敗したときには元のスタイルが消えた状態で `style.load` も発火しない。`error` イベントから失敗を見分けるのは確実ではない（`GeoloniaMap` はスタイル名を実際の URL に解決し、`transformRequest` でも URL が変わる）。取得の失敗を扱う必要がある場合は、スタイルの JSON を先に `fetch` して確かめ、取得できたときだけオブジェクトとして `setStyle()` に渡す。こうすると失敗しても `setStyle()` を呼ばないので、今の地図はそのまま残る。ただし style.json の中の相対 URL（スプライトやソース）は解決されなくなるので、この方法は中身が絶対 URL のスタイルに使う。
 
 ```js
 let currentPoints = initialPoints; // setData() するときは、この変数も更新する
 
 function restoreCustomLayers() {
-  if (!map.hasImage('app-pin')) map.addImage('app-pin', pinImage); // スプライトと重ならない ID
-  if (!map.getSource('points')) map.addSource('points', { type: 'geojson', data: currentPoints });
-  if (!map.getLayer('points')) {
-    map.addLayer({ id: 'points', type: 'symbol', source: 'points', layout: { 'icon-image': 'app-pin' } });
+  // ID は切り替え先のスタイルと重ならない名前にする
+  if (!map.hasImage('app-pin')) map.addImage('app-pin', pinImage);
+  if (!map.getSource('app-points')) map.addSource('app-points', { type: 'geojson', data: currentPoints });
+  if (!map.getLayer('app-points')) {
+    map.addLayer({ id: 'app-points', type: 'symbol', source: 'app-points', layout: { 'icon-image': 'app-pin' } });
   }
 }
 
 map.on('load', restoreCustomLayers); // 最初の読み込み
 
-let currentStyle = initialStyleUrl;
+async function switchStyle(nextStyleUrl) {
+  // 先に取得して確かめる。失敗したら setStyle() を呼ばないので、今の地図はそのまま残る
+  const res = await fetch(nextStyleUrl);
+  if (!res.ok) throw new Error(`スタイルを取得できません（${res.status}）`);
+  const style = await res.json();
+  if (style.version !== 8 || !Array.isArray(style.layers)) throw new Error('スタイルの形式が正しくありません');
 
-function switchStyle(nextStyle, isFallback = false) {
-  const previousStyle = currentStyle;
-  const onLoad = () => {
-    map.off('error', onError);
-    currentStyle = nextStyle;
-    restoreCustomLayers();
-  };
-  const onError = (e) => {
-    if (e.error?.url !== nextStyle) return; // スタイルの取得以外の error は無視する
-    map.off('error', onError);
-    map.off('style.load', onLoad);
-    if (isFallback) return showStyleError(); // 元のスタイルでも失敗したら、戻すのをやめて知らせる
-    switchStyle(previousStyle, true); // 元のスタイルに 1 回だけ戻し、同じ手順で足し直す
-  };
-  map.on('error', onError);
-  map.once('style.load', onLoad); // setStyle の前に登録する
-  map.setStyle(nextStyle, { diff: false });
+  map.once('style.load', restoreCustomLayers); // setStyle の前に登録する
+  map.setStyle(style, { diff: false });
 }
 ```
 
