@@ -133,7 +133,7 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 
 - 自前のソース・レイヤー・画像の ID は、切り替え先のスタイルと重ならない名前にする（`app-` などの接頭辞を付ける）。同じ ID のソースやレイヤーが切り替え先にあると、有無の確認で足し直しが飛ばされる。画像は、`style.load` がスプライトの読み込みより先に発火するので、同じ ID の画像がスプライトにあると後から上書きされる。
 - `setData()` でソースのデータを更新しているなら、最新のデータをアプリ側の変数に持っておき、足し直すときはそれを使う。
-- URL を `setStyle()` に渡すと、取得に失敗したときには元のスタイルが消えた状態で `style.load` も発火しない。`error` イベントから失敗を見分けるのは確実ではない（`GeoloniaMap` はスタイル名を実際の URL に解決し、`transformRequest` でも URL が変わる）。取得の失敗を扱う必要がある場合は、スタイルの JSON を先に `fetch` して確かめ、取得できたときだけオブジェクトとして `setStyle()` に渡す。こうすると失敗しても `setStyle()` を呼ばないので、今の地図はそのまま残る。ただし style.json の中の相対 URL（スプライトやソース）は解決されなくなるので、この方法は中身が絶対 URL のスタイルに使う。
+- スタイルの取得に失敗したときの扱い（元のスタイルに戻す、利用者に知らせるなど）は Mapbox GL JS でも同じ課題で、移行で変わる点ではないので、このガイドでは扱わない。移行前のコードに取得失敗の処理があれば、そのまま移す。
 
 ```js
 let currentPoints = initialPoints; // setData() するときは、この変数も更新する
@@ -149,15 +149,9 @@ function restoreCustomLayers() {
 
 map.on('load', restoreCustomLayers); // 最初の読み込み
 
-async function switchStyle(nextStyleUrl) {
-  // 先に取得して確かめる。失敗したら setStyle() を呼ばないので、今の地図はそのまま残る
-  const res = await fetch(nextStyleUrl);
-  if (!res.ok) throw new Error(`スタイルを取得できません（${res.status}）`);
-  const style = await res.json();
-  if (style.version !== 8 || !Array.isArray(style.layers)) throw new Error('スタイルの形式が正しくありません');
-
+function switchStyle(nextStyle) {
   map.once('style.load', restoreCustomLayers); // setStyle の前に登録する
-  map.setStyle(style, { diff: false });
+  map.setStyle(nextStyle, { diff: false });
 }
 ```
 
