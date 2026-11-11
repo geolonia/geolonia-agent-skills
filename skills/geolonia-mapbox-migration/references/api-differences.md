@@ -129,12 +129,20 @@ Content-Security-Policy を設定しているページで、CDN から ES モジ
 - `{ diff: false }` を渡して、必ず作り直させる（差分が無いと `style.load` が発火せず、登録したリスナーが残って次の切り替えで二重に動く）。
 - 足し直す前に `getSource()` / `getLayer()` / `hasImage()` で、すでにあるかを確かめる（同じ ID で足すと例外になる）。
 
+あわせて次の点に気をつける。
+
+- 自前の画像の ID は、スプライトの画像と重ならない名前にする。`style.load` はスプライトの読み込みより先に発火するので、同じ ID の画像がスプライトにあると、足した画像が後からスプライトの画像で上書きされる。
+- `setData()` でソースのデータを更新しているなら、最新のデータをアプリ側の変数に持っておき、足し直すときはそれを使う。
+- URL のスタイルの取得に失敗すると、`style.load` は発火せず、元のスタイルも消えた状態になる。切り替えの間は `error` イベントを見て、失敗したら `map.off('style.load', restoreCustomLayers)` でリスナーを外し、元のスタイルを設定し直す（`error` はタイルの取得失敗などでも発火するので、切り替えの間だけ見る）。
+
 ```js
+let currentPoints = initialPoints; // setData() するときは、この変数も更新する
+
 function restoreCustomLayers() {
-  if (!map.hasImage('pin')) map.addImage('pin', pinImage);
-  if (!map.getSource('points')) map.addSource('points', { type: 'geojson', data: points });
+  if (!map.hasImage('app-pin')) map.addImage('app-pin', pinImage); // スプライトと重ならない ID
+  if (!map.getSource('points')) map.addSource('points', { type: 'geojson', data: currentPoints });
   if (!map.getLayer('points')) {
-    map.addLayer({ id: 'points', type: 'symbol', source: 'points', layout: { 'icon-image': 'pin' } });
+    map.addLayer({ id: 'points', type: 'symbol', source: 'points', layout: { 'icon-image': 'app-pin' } });
   }
 }
 
