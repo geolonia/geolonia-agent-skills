@@ -44,7 +44,7 @@ const map = new geolonia.Map({
 
 ### 外部 style.json を使用
 
-Geolonia のタイルを参照しない自前の style.json の URL を指定する場合、有効な Geolonia API キーは不要（CDN の URL の `geolonia-api-key` は、値を `YOUR-API-KEY` のままにして残す。省くと iframe の中で `class="geolonia"` が描画されない）:
+Geolonia のタイルを参照しない自前の style.json の URL を指定する場合、有効な Geolonia API キーは不要（CDN の URL の `geolonia-api-key` は、値を `YOUR-API-KEY` のままにして残す。省くと、embed v6.0.0 では別オリジンの iframe の中で `class="geolonia"` が描画されない）:
 
 ```html
 <div class="geolonia" data-style="https://example.com/my-style.json" style="height: 400px;"></div>
