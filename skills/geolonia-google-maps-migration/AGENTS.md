@@ -39,7 +39,7 @@
 | `polygon.addListener('click', ...)` | 同じ書き方でよい（`e.latLng` / `e.domEvent`）。図形上のクリックで地図の `click` は発火しない |
 | `map.data.addListener('click', ...)` | **発火しない**。`map.getGeoloniaMap()` で自前レイヤーを描いて `impl.on('click', layerId, ...)` |
 | `map.moveCamera({...})` / `setHeading()` | 同名で使える（`setTilt()` も） |
-| `new google.maps.Geocoder()` | `new geolonia.maps.Geocoder()`。日本の住所 → 位置のみ（逆ジオコーディングは無い）。結果は 1 件 |
+| `new google.maps.Geocoder()` | `new geolonia.maps.Geocoder()`。日本の住所 → 位置のみ（逆ジオコーディングは無い）。特定できれば結果は 1 件。`componentRestrictions` 等で結果は絞れない |
 | `DirectionsService` / `PlacesService` | **存在しない**（`importLibrary("places")` は空オブジェクト） |
 | `map.data.addGeoJson(...)` | 同名で使える（`geolonia.maps.Data`。`setStyle` / `toGeoJson` も） |
 

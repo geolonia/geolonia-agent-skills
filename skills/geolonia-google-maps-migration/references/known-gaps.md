@@ -152,6 +152,7 @@ map.whenReady().then(() => {
 座標から住所を引く逆ジオコーディング（`geocode({ location })`）は `INVALID_REQUEST` で reject
 されるので、Geolonia の [open-reverse-geocoder](https://github.com/geolonia/open-reverse-geocoder)
 を別途組み合わせる（[`geolonia-map`](../../maps/SKILL.md) スキルの `geocoding.md` を参照）。
+ただし取得できるのは都道府県・市区町村名までで、町名や番地が必要な場合は別のサービスを使う。
 日本以外の住所も引けない。
 
 ## デバッグ時の切り分け方

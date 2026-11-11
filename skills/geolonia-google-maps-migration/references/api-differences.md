@@ -162,9 +162,14 @@ new geolonia.maps.Marker({ position: results[0].geometry.location, map });
 
 - 対応するのは `address` による検索だけ。`location`（逆ジオコーディング）や `placeId` を渡すと
   `INVALID_REQUEST` で reject される。逆ジオコーディングは [`geolonia-map`](../../maps/SKILL.md)
-  スキルの `geocoding.md`（Open Reverse Geocoder）を使う。
+  スキルの `geocoding.md`（Open Reverse Geocoder）を使う。ただし取得できるのは都道府県・
+  市区町村名までで、町名や番地は得られない。
 - `bounds` / `componentRestrictions` / `language` / `region` は受け付けるが、結果には影響しない。
-- 結果は常に 1 件。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる
+  これらで検索範囲を絞っている既存コードは、範囲外の結果を受け取りうるので、
+  `address_components` の都道府県（`administrative_area_level_1`）や市区町村（`locality`）を
+  アプリ側で確かめる。
+- 住所を特定できた場合の結果は 1 件。`fulfillOnZeroResults: true` で特定できなかった場合は
+  `results` が空なので、`results[0]` の前に件数を確かめる。`formatted_address` は `日本、東京都台東区上野公園7-7` のように `日本、` で始まる
   （`日本` だけを入力した場合は国を表す `日本`）。郵便番号だけの入力は `ZERO_RESULTS` になる。
   `place_id` は常に空文字列。
 - `geometry.location_type` は、住居表示住所か地番の位置まで特定できたときが `ROOFTOP`、
