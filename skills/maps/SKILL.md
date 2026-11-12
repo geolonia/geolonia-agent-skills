@@ -38,7 +38,7 @@ Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラ�
 ```
 
 - API キーは Geolonia のタイル・スタイルを使う場合に必要
-- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する場合は、有効な API キーは要らない（外部の style.json でも Geolonia のタイルを参照していればキーが要る）。URL の `geolonia-api-key` パラメータも省ける（省くとコンソールに `[Geolonia] Missing API key.` と出るが、表示には影響しない）
+- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する場合は、有効な API キーは要らない（外部の style.json でも Geolonia のタイルを参照していればキーが要る）。URL の `geolonia-api-key` パラメータも省ける（省くとブラウザのコンソールに `console.error` で `[Geolonia] Missing API key.` が出るが、表示には影響しない）
 - `embed/v6` は MapLibre GL JS v6 系を同梱し、その worker を `blob:` URL から起動する。Content-Security-Policy を設定しているページでは `worker-src blob:` を許可する
 - `</body>` の直前に配置する
 - 新規実装では `embed/v6/embed` を使う。`embed/v5/embed`（MapLibre GL JS v5 系を同梱）と旧形式の `v1/embed` は旧版で、配信は続いているが新しく書くコードでは使わない

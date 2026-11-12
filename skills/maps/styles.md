@@ -44,7 +44,7 @@ const map = new geolonia.Map({
 
 ### 外部 style.json を使用
 
-Geolonia のタイルを参照しない自前の style.json の URL を指定する場合、有効な Geolonia API キーは不要（CDN の URL の `geolonia-api-key` も省ける）:
+Geolonia のスタイルもタイルも参照しない外部の style.json の URL を指定する場合、有効な Geolonia API キーは不要（CDN の URL の `geolonia-api-key` も省ける。省くとブラウザのコンソールに `console.error` で `[Geolonia] Missing API key.` が出るが、表示には影響しない）:
 
 ```html
 <div class="geolonia" data-style="https://example.com/my-style.json" style="height: 400px;"></div>
