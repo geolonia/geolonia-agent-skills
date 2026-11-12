@@ -130,7 +130,7 @@ GeoJSON の properties の値に応じて、色や大きさを変えて描く。
 - 描き分けは、地物の simplestyle の `fill` や `marker-color` より優先する。`data-choropleth`、`data-circle-size`、数値で色分けするときの `data-circle-color` では、値が数値でない地物は simplestyle の見た目に戻る。`data-heatmap` では、重みの値が数値でない地物は重み 0 になる（数値の値が 1 件も無いか、すべて同じ値のときは、全地物が同じ重みになる）。
 - `data-choropleth` では、`fill-opacity` を持たないポリゴンは背景の地図が透けるよう不透明度 0.7 で描く。
 - `data-heatmap`、`data-circle-size`、`data-circle-color` はクラスタリングを止める。`data-heatmap` と `data-circle-size` / `data-circle-color` を両方指定すると、ヒートマップだけを描き、円は描かない。`data-heatmap` はポイントのマーカーを描かない。`data-circle-*` は `marker-symbol` を持つポイントも含めてすべて円で描き、アイコンとタイトルは出さない。
-- `"12"` のような数字の文字列は、どの属性でも数値として扱わない。`data-choropleth` と `data-circle-size` では simplestyle の見た目に、`data-heatmap` では重み 0 に、`data-circle-color` ではカテゴリになる。数値で描き分けたい値は、properties に数値型で書く。`data-circle-color` では、オブジェクトや配列の値は色分けしない。
+- `"12"` のような数字の文字列は、どの属性でも数値として扱わない。`data-choropleth` と `data-circle-size` では simplestyle の見た目に、`data-heatmap` では重み 0（重みの値がすべて数字の文字列なら、全地物が同じ重み）に、`data-circle-color` ではカテゴリになる。数値で描き分けたい値は、properties に数値型で書く。`data-circle-color` では、オブジェクトや配列の値は色分けしない。
 
 ### UI コントロール
 
