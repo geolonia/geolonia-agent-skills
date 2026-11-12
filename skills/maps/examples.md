@@ -69,7 +69,7 @@ markers.geojson:
 
   const locations = [
     { lngLat: [139.7671, 35.6812], title: '東京駅' },
-    { lngLat: [139.7454, 35.6586], title: '渋谷駅' },
+    { lngLat: [139.7016, 35.6580], title: '渋谷駅' },
     { lngLat: [139.7006, 35.6902], title: '新宿駅' }
   ];
 

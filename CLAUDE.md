@@ -13,7 +13,7 @@ Geolonia Maps の Embed API、JavaScript API、ジオコーディング、マッ
 skills/
 ├── maps/
 │   ├── SKILL.md               # メインスキル定義（自動呼び出し条件 + 基本原則）
-│   ├── embed-api.md           # Embed API リファレンス（data-* 属性一覧）
+│   ├── embed-data-attributes.md # Embed API リファレンス（data-* 属性一覧）
 │   ├── javascript-api.md      # JavaScript API リファレンス
 │   ├── geocoding.md           # ジオコーディング（住所↔座標変換・住所正規化）
 │   ├── styles.md              # マップスタイル一覧とカスタマイズ

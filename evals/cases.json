@@ -1,5 +1,5 @@
 {
-  "skillFiles": ["SKILL.md", "embed-api.md", "styles.md", "geocoding.md"],
+  "skillFiles": ["SKILL.md", "embed-data-attributes.md", "styles.md", "geocoding.md"],
   "cases": [
     {
       "id": "explicit-cdn",
