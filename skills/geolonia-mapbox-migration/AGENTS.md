@@ -1,6 +1,6 @@
 # Geolonia Mapbox 移行 クイックリファレンス（エージェント向け）
 
-`SKILL.md` の凝縮版。記述は `@geolonia/maps-core` **v0.8.0**（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0）の時点。詳細は同ディレクトリの `references/` を参照する。
+`SKILL.md` の凝縮版。記述は `@geolonia/maps-core` **v0.8.0**（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.1、MapLibre GL JS v6.16.0）の時点。詳細は同ディレクトリの `references/` を参照する。
 
 インストール済みの版がここより新しい場合は、この文書ではなく `node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts` を正とする。
 
@@ -9,7 +9,7 @@
 - MapLibre GL JS は Mapbox GL JS v1.13 から分岐した。v1 時代からある API（`Map`、`Marker`、`Popup`、`addSource`、`addLayer`、イベント、式）は名前空間の置き換えだけで動く。
 - npm の `mapbox-gl` は `@geolonia/maps-core` に移す（`npm install @geolonia/maps-core maplibre-gl`）。`GeoloniaMap` は `maplibregl.Map` を継承している。ESM 専用。
 - script タグの Mapbox GL JS は CDN の `embed/v6` に移す（`geolonia.Map`）。こちらも MapLibre GL JS v6 系で、worker は同梱されているので設定は要らない（CSP では `worker-src blob:` を許可する）。
-- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルかタイルを使うときだけ `apiKey` を渡す（外部の style.json でも Geolonia のタイルを参照していれば要る）。CDN では URL の `geolonia-api-key` で渡す（外部スタイルだけでもパラメータは残す。値は `YOUR-API-KEY` でよい）。
+- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルかタイルを使うときだけ `apiKey` を渡す（外部の style.json でも Geolonia のタイルを参照していれば要る）。CDN では URL の `geolonia-api-key` で渡す（Geolonia のスタイルもタイルも参照しない外部の style.json だけなら省ける）。
 
 ## 対応表（詳細は references/）
 
