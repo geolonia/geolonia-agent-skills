@@ -54,7 +54,7 @@ Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラ�
 
 各トピックの詳細は以下を参照:
 
-- [Embed API リファレンス](embed-data-attributes.md) - data-* 属性の全一覧と既定値、データの値による描き分け
+- [Embed API リファレンス](embed-data-attributes.md) - data-* 属性の一覧と既定値、データの値による描き分け
 - [JavaScript API リファレンス](javascript-api.md) - geolonia.Map、Marker、Popup、SimpleStyle、プラグイン
 - [ジオコーディング](geocoding.md) - 住所→座標、座標→住所、住所正規化
 - [マップスタイル](styles.md) - 組み込みスタイル一覧とカスタマイズ方法
