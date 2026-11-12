@@ -40,7 +40,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 | `data-min-zoom` | 最小ズームレベル | 指定なし |
 | `data-max-zoom` | 最大ズームレベル | `20` |
 
-`data-lat` と `data-lng` を省き、`data-geojson` を指定すると、地図は GeoJSON の範囲に合わせて表示される。
+`data-lat` と `data-lng` を省き、`data-geojson` か `data-simple-vector` を指定すると、地図はそのデータの範囲に合わせて表示される。
 
 ### スタイル
 
@@ -62,13 +62,13 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 | `data-custom-marker` | マーカーとして使う要素の CSS セレクタ | 指定なし |
 | `data-custom-marker-offset` | カスタムマーカーのずらし量。`"x, y"` 形式のピクセル値 | `0, 0` |
 
-要素の中に書いた HTML は、マーカーのポップアップの中身になる（上の「マーカーにポップアップを追加」を参照）。
+要素の中に書いた HTML は、マーカーのポップアップの中身になる（上の「マーカーにポップアップを追加」を参照）。マーカーが表示されるとき（`data-lat` と `data-lng` があり、`data-marker` が `on`）だけで、そうでないときは中の HTML は表示されずに消える。
 
 ### GeoJSON
 
 | 属性 | 説明 | デフォルト |
 | --- | --- | --- |
-| `data-geojson` | GeoJSON の URL、またはページ内の要素（`<script type="application/json">` など）を指す CSS セレクタ。URL は `https://` などで始まる絶対 URL か、`./`、`../`、`/` で始まる相対 URL にする（`data.geojson` のように書くと読み込まれない） | 指定なし |
+| `data-geojson` | GeoJSON の URL、またはページ内の要素（`<script type="application/json">` など）を指す CSS セレクタ（要素の中身が正しい JSON でないと地図が初期化されない）。URL は `http://` か `https://` で始まる絶対 URL か、`./`、`../`、`/` で始まる相対 URL にする（`data.geojson` のように書くと読み込まれない） | 指定なし |
 | `data-cluster` | ポイントをクラスタリングする（`on` / `off`） | `on` |
 | `data-cluster-color` | クラスタの円の色 | `#ff0000` |
 | `data-simple-vector` | simplestyle で描くベクトルタイルの TileJSON（tiles.json）の絶対 URL、または Geolonia のカスタムタイルの ID。描くのは `g-simplestyle-v1` レイヤーだけ。`https://`、`http://`、`geolonia://` で始まらない値はカスタムタイルの ID とみなす | 指定なし |
@@ -88,16 +88,18 @@ GeoJSON の地物の色や線の太さは、地物の properties に [simplestyl
 
 GeoJSON の properties の値に応じて、色や大きさを変えて描く。MapLibre の式を書かずに済む。どれも `data-geojson` と組み合わせて使う。
 
+これらの属性は `class="geolonia"` の要素でだけ効く。`new geolonia.Map()` で作る地図では属性を読まないので、`choropleth`、`heatmap`、`circle` のオプションで渡す。
+
 | 属性 | 説明 |
 | --- | --- |
 | `data-choropleth` | ポリゴンを、このプロパティの数値で塗り分ける（コロプレス図） |
 | `data-choropleth-colors` | 塗り分けの色。値の小さい側から順にカンマで区切る。既定は `#FFF2CC, #FFAB40, #EA5C0D, #B3261E` |
 | `data-choropleth-range` | 色を割り当てる値の範囲。`"最小,最大"` 形式。省くか、読めない値（最小が最大以上など）のときはデータの最小値と最大値を使う |
-| `data-heatmap` | ポイントをヒートマップで描く。`on` ならすべて同じ重み、プロパティ名を書くとその値を重みにする。`off` か空なら描かない |
+| `data-heatmap` | ポイントをヒートマップで描く。`on` ならすべて同じ重み。プロパティ名を書くと、その値をデータの最小値で 0、最大値で 1 とした重みにする（最小値の地点は重み 0 で描かれない）。`off` か空なら描かない |
 | `data-heatmap-colors` | ヒートマップの色。密度の低い側から順にカンマで区切る。既定は `#FABF3D, #FFAB40, #EA5C0D, #B3261E` |
 | `data-circle-size` | ポイントを円で描き、このプロパティの値で円の大きさ（半径 3〜11 ピクセル）を変える |
 | `data-circle-color` | ポイントを円で描き、このプロパティの値で円の色を変える。値がすべて数値なら連続した色、それ以外は値ごとに別の色にする |
-| `data-circle-colors` | `data-circle-color` に使う色をカンマで区切る。数値なら小さい側から、カテゴリなら出現順に割り当てる。`data-circle-color` が無いと使われない |
+| `data-circle-colors` | `data-circle-color` に使う色をカンマで区切る。数値なら小さい側から、カテゴリなら出現順に割り当てる。`data-circle-color` が無いと使われない。既定は、数値なら `#FFF2CC, #FFAB40, #EA5C0D, #B3261E`、カテゴリなら `#EA5C0D, #2B6CB0, #FABF3D, #5B8C2A, #9A5B1E, #7A4FA0, #E8402F, #6B7280`。カテゴリが色の数より多いと色を繰り返す |
 
 ```html
 <!-- 人口で市区町村のポリゴンを塗り分ける -->
@@ -125,10 +127,10 @@ GeoJSON の properties の値に応じて、色や大きさを変えて描く。
 
 - `-colors` と `-range` の属性は、描き分けを有効にする属性が無いと無視される。`data-choropleth-*` には `data-choropleth`、`data-heatmap-colors` には `data-heatmap`、`data-circle-colors` には `data-circle-color` が要る。
 - 色はカンマで区切るが、`rgb(0, 0, 0)` のように括弧の中にあるカンマは区切りとして扱わない。
-- 描き分けは、地物の simplestyle の `fill` や `marker-color` より優先する。`data-choropleth`、`data-circle-size`、数値で色分けするときの `data-circle-color` では、値が数値でない地物は simplestyle の見た目に戻る。`data-heatmap` では、重みの値が数値でない地物は重み 0 になる。
+- 描き分けは、地物の simplestyle の `fill` や `marker-color` より優先する。`data-choropleth`、`data-circle-size`、数値で色分けするときの `data-circle-color` では、値が数値でない地物は simplestyle の見た目に戻る。`data-heatmap` では、重みの値が数値でない地物は重み 0 になる（数値の値が 1 件も無いか、すべて同じ値のときは、全地物が同じ重みになる）。
 - `data-choropleth` では、`fill-opacity` を持たないポリゴンは背景の地図が透けるよう不透明度 0.7 で描く。
 - `data-heatmap`、`data-circle-size`、`data-circle-color` はクラスタリングを止める。`data-heatmap` と `data-circle-size` / `data-circle-color` を両方指定すると、ヒートマップだけを描き、円は描かない。`data-heatmap` はポイントのマーカーを描かない。`data-circle-*` は `marker-symbol` を持つポイントも含めてすべて円で描き、アイコンとタイトルは出さない。
-- `data-circle-color` では、`"12"` のような数字の文字列は数値ではなくカテゴリとして扱う。オブジェクトや配列の値は色分けしない。
+- `"12"` のような数字の文字列は、どの属性でも数値として扱わない。`data-choropleth` と `data-circle-size` では simplestyle の見た目に、`data-heatmap` では重み 0 に、`data-circle-color` ではカテゴリになる。数値で描き分けたい値は、properties に数値型で書く。`data-circle-color` では、オブジェクトや配列の値は色分けしない。
 
 ### UI コントロール
 
