@@ -16,3 +16,4 @@ midnight
 basic
 OSRM
 Noto
+choropleth

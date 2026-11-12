@@ -188,7 +188,7 @@ function switchStyle(nextStyle) {
 - `embed/v6` が同梱しているのは MapLibre GL JS v6 系（v6.0.1 では 6.16.0）で、内部で `@geolonia/maps-core` を使っている。このページの「`GeoloniaMap` のオプションと既定値」「戻り値とコールバックの違い」「スタイルとレイヤー」は、クラスを `geolonia.*` から使う点（`GeoloniaMarker` は `geolonia.Marker`）を除いてそのまま当てはまる。npm 版との主な違いは、worker が同梱されていて `setWorkerUrl()` が要らないこと、API キーを URL から読むこと、`class="geolonia"` の要素を自動で地図に変換すること、`window.maplibregl` / `window.mapboxgl` を上書きすること。Content-Security-Policy を設定しているページでは、worker が `blob:` URL から起動するので `worker-src blob:` を許可する。
 - 旧版の `embed/v5`（MapLibre GL JS v5 系を同梱）も配信は続いているが、新しく移すコードでは使わない。
 - `class="geolonia"` を持つ要素は、embed が自動で地図に変換する。移行先のページで別の用途にこのクラス名を使っていないか確かめる。
-- 詳しい使い方は [`geolonia-map`](../../maps/SKILL.md) スキルの `javascript-api.md` と `embed-api.md`。
+- 詳しい使い方は [`geolonia-map`](../../maps/SKILL.md) スキルの `javascript-api.md` と `embed-data-attributes.md`。
 
 ## CSS のクラス名
 
