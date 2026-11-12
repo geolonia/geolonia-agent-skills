@@ -24,6 +24,7 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 ## data 属性一覧
 
 - 値はすべて文字列で書く。on/off の属性は `on` か `off` を指定する。
+- 通常の埋め込みで指定しない `data-stage` と `data-api-url` は載せていない。
 - 一覧に無い `data-*` 属性もそのまま Embed プラグインに渡る（[JavaScript API リファレンス](javascript-api.md) のプラグインの節を参照）。
 
 ### 位置・表示
@@ -67,10 +68,19 @@ div の中に HTML を書くと、マーカーのポップアップとして表�
 
 | 属性 | 説明 | デフォルト |
 | --- | --- | --- |
-| `data-geojson` | GeoJSON の URL、JSON の文字列、またはページ内の要素（`<script type="application/json">` など）を指す CSS セレクタ | 指定なし |
+| `data-geojson` | GeoJSON の URL、またはページ内の要素（`<script type="application/json">` など）を指す CSS セレクタ。URL は `https://` などで始まる絶対 URL か、`./`、`../`、`/` で始まる相対 URL にする（`data.geojson` のように書くと読み込まれない） | 指定なし |
 | `data-cluster` | ポイントをクラスタリングする（`on` / `off`） | `on` |
 | `data-cluster-color` | クラスタの円の色 | `#ff0000` |
-| `data-simple-vector` | simplestyle で描くベクトルタイルの URL、または Geolonia のカスタムタイルの ID | 指定なし |
+| `data-simple-vector` | simplestyle で描くベクトルタイルの TileJSON（tiles.json）の絶対 URL、または Geolonia のカスタムタイルの ID。描くのは `g-simplestyle-v1` レイヤーだけ。`https://`、`http://`、`geolonia://` で始まらない値はカスタムタイルの ID とみなす | 指定なし |
+
+GeoJSON をページに直接書くときは、JSON の文字列を `data-geojson` に入れず、`<script type="application/json">` に書いてそのセレクタを指定する（JSON の文字列を渡すとエラーになり、地物は描かれない）:
+
+```html
+<script type="application/json" id="points">
+  { "type": "FeatureCollection", "features": [] }
+</script>
+<div class="geolonia" data-geojson="#points" style="height: 400px;"></div>
+```
 
 GeoJSON の地物の色や線の太さは、地物の properties に [simplestyle-spec](https://github.com/mapbox/simplestyle-spec) のキー（`marker-color`、`fill`、`stroke` など）を書いて指定する。
 
@@ -87,7 +97,7 @@ GeoJSON の properties の値に応じて、色や大きさを変えて描く。
 | `data-heatmap-colors` | ヒートマップの色。密度の低い側から順にカンマで区切る。既定は `#FABF3D, #FFAB40, #EA5C0D, #B3261E` |
 | `data-circle-size` | ポイントを円で描き、このプロパティの値で円の大きさ（半径 3〜11 ピクセル）を変える |
 | `data-circle-color` | ポイントを円で描き、このプロパティの値で円の色を変える。値がすべて数値なら連続した色、それ以外は値ごとに別の色にする |
-| `data-circle-colors` | `data-circle-color` に使う色をカンマで区切る。数値なら小さい側から、カテゴリなら出現順に割り当てる |
+| `data-circle-colors` | `data-circle-color` に使う色をカンマで区切る。数値なら小さい側から、カテゴリなら出現順に割り当てる。`data-circle-color` が無いと使われない |
 
 ```html
 <!-- 人口で市区町村のポリゴンを塗り分ける -->
@@ -113,16 +123,16 @@ GeoJSON の properties の値に応じて、色や大きさを変えて描く。
 ></div>
 ```
 
-- `-colors` と `-range` の属性は、描き分けを有効にする属性（`data-choropleth`、`data-heatmap`、`data-circle-size` か `data-circle-color`）が無いと無視される。
+- `-colors` と `-range` の属性は、描き分けを有効にする属性が無いと無視される。`data-choropleth-*` には `data-choropleth`、`data-heatmap-colors` には `data-heatmap`、`data-circle-colors` には `data-circle-color` が要る。
 - 色はカンマで区切るが、`rgb(0, 0, 0)` のように括弧の中にあるカンマは区切りとして扱わない。
-- 描き分けは、地物の simplestyle の `fill` や `marker-color` より優先する。値が数値でない地物は simplestyle の見た目に戻る。
+- 描き分けは、地物の simplestyle の `fill` や `marker-color` より優先する。`data-choropleth`、`data-circle-size`、数値で色分けするときの `data-circle-color` では、値が数値でない地物は simplestyle の見た目に戻る。`data-heatmap` では、重みの値が数値でない地物は重み 0 になる。
 - `data-choropleth` では、`fill-opacity` を持たないポリゴンは背景の地図が透けるよう不透明度 0.7 で描く。
-- `data-heatmap` と `data-circle-*` はクラスタリングを止める。`data-heatmap` はポイントのマーカーを描かない。`data-circle-*` は `marker-symbol` を持つポイントも含めてすべて円で描き、アイコンとタイトルは出さない。
+- `data-heatmap`、`data-circle-size`、`data-circle-color` はクラスタリングを止める。`data-heatmap` と `data-circle-size` / `data-circle-color` を両方指定すると、ヒートマップだけを描き、円は描かない。`data-heatmap` はポイントのマーカーを描かない。`data-circle-*` は `marker-symbol` を持つポイントも含めてすべて円で描き、アイコンとタイトルは出さない。
 - `data-circle-color` では、`"12"` のような数字の文字列は数値ではなくカテゴリとして扱う。オブジェクトや配列の値は色分けしない。
 
 ### UI コントロール
 
-位置を指定する属性には `on`、`off`、または表示位置（`top-right`、`top-left`、`bottom-right`、`bottom-left`）を書く。
+位置を指定する属性には `on`、`off`、または表示位置（`top-right`、`top-left`、`bottom-right`、`bottom-left`）を書く。ただし `data-geolonia-control` は `off` にしても消えない。
 
 | 属性 | 説明 | デフォルト |
 | --- | --- | --- |
@@ -130,7 +140,7 @@ GeoJSON の properties の値に応じて、色や大きさを変えて描く。
 | `data-geolocate-control` | 現在地のコントロール | `off` |
 | `data-fullscreen-control` | 全画面のコントロール | `off` |
 | `data-scale-control` | スケールバー | `off` |
-| `data-geolonia-control` | Geolonia のロゴのコントロール | `on` |
+| `data-geolonia-control` | Geolonia のロゴのコントロール。表示位置だけ変えられ、`off` を指定してもロゴは消えない | `on` |
 
 ### その他
 
