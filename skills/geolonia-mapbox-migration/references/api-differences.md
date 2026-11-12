@@ -1,6 +1,6 @@
 # Mapbox GL JS と Geolonia Maps の API の違い
 
-記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0 を同梱）の時点。インストールした版がこれより新しい場合は、`node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts` を正とする。
+記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.1、MapLibre GL JS v6.16.0 を同梱）の時点。インストールした版がこれより新しい場合は、`node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts` を正とする。
 
 「Mapbox にあって Geolonia Maps に無いもの」は [`known-gaps.md`](known-gaps.md) を参照。
 
@@ -183,9 +183,9 @@ function switchStyle(nextStyle) {
 </script>
 ```
 
-- API キーは `<script>` の URL の `geolonia-api-key` で渡す。Geolonia のスタイルもタイルも参照しない外部の style.json だけを使う場合も、パラメータは残す（値は `YOUR-API-KEY` のままでよい）。外部の style.json だけを `new geolonia.Map()` で使うなら省いても描画されるが（上の例の `geolonia/basic-v2` のような Geolonia のスタイルではキーが要る）、`class="geolonia"` の要素も使う場合は、URL にも `data-key` にもキーが無いと embed v6.0.0 では別オリジンの iframe の中で描画されなくなる。
+- API キーは `<script>` の URL の `geolonia-api-key` で渡す。Geolonia のスタイルもタイルも参照しない外部の style.json だけを使う場合は、パラメータごと省ける（上の例の `geolonia/basic-v2` のような Geolonia のスタイルではキーが要る）。省くとブラウザのコンソールに `console.error` で `[Geolonia] Missing API key.` が出るが、表示には影響しない。移行後の動作確認でこのエラーを見ても、地図が壊れているわけではない。
 - CSS は embed に同梱されているので、`<link>` は要らない。
-- `embed/v6` が同梱しているのは MapLibre GL JS v6 系（v6.0.0 では 6.16.0）で、内部で `@geolonia/maps-core` を使っている。このページの「`GeoloniaMap` のオプションと既定値」「戻り値とコールバックの違い」「スタイルとレイヤー」は、クラスを `geolonia.*` から使う点（`GeoloniaMarker` は `geolonia.Marker`）を除いてそのまま当てはまる。npm 版との主な違いは、worker が同梱されていて `setWorkerUrl()` が要らないこと、API キーを URL から読むこと、`class="geolonia"` の要素を自動で地図に変換すること、`window.maplibregl` / `window.mapboxgl` を上書きすること。Content-Security-Policy を設定しているページでは、worker が `blob:` URL から起動するので `worker-src blob:` を許可する。
+- `embed/v6` が同梱しているのは MapLibre GL JS v6 系（v6.0.1 では 6.16.0）で、内部で `@geolonia/maps-core` を使っている。このページの「`GeoloniaMap` のオプションと既定値」「戻り値とコールバックの違い」「スタイルとレイヤー」は、クラスを `geolonia.*` から使う点（`GeoloniaMarker` は `geolonia.Marker`）を除いてそのまま当てはまる。npm 版との主な違いは、worker が同梱されていて `setWorkerUrl()` が要らないこと、API キーを URL から読むこと、`class="geolonia"` の要素を自動で地図に変換すること、`window.maplibregl` / `window.mapboxgl` を上書きすること。Content-Security-Policy を設定しているページでは、worker が `blob:` URL から起動するので `worker-src blob:` を許可する。
 - 旧版の `embed/v5`（MapLibre GL JS v5 系を同梱）も配信は続いているが、新しく移すコードでは使わない。
 - `class="geolonia"` を持つ要素は、embed が自動で地図に変換する。移行先のページで別の用途にこのクラス名を使っていないか確かめる。
 - 詳しい使い方は [`geolonia-map`](../../maps/SKILL.md) スキルの `javascript-api.md` と `embed-api.md`。

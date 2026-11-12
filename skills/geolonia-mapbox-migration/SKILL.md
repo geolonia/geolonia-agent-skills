@@ -20,7 +20,7 @@ MapLibre GL JS は Mapbox GL JS v1.13（BSD ライセンス最後の版）から
 - **分岐後に Mapbox だけが足した API**: `setFog`、FreeCamera、Mapbox Standard スタイルとその設定 API（`setConfigProperty` など）、3D モデルレイヤーなど
 - **Geolonia Maps 固有の差分**: `GeoloniaMap` の既定値（コントロール、ジェスチャ操作）、API キー、MapLibre v6 の worker 設定
 
-**このスキルの記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0 を同梱）の時点のもの。** インストールした版がこれより新しい場合は、インストール済みパッケージの型定義（`node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts`）を正とする。
+**このスキルの記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.1、MapLibre GL JS v6.16.0 を同梱）の時点のもの。** インストールした版がこれより新しい場合は、インストール済みパッケージの型定義（`node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts`）を正とする。
 
 ## 移行先の選び方
 
