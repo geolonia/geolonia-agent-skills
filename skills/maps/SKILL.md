@@ -34,13 +34,14 @@ Geolonia Maps は MapLibre GL JS をベースにした日本向け地図プラ�
 ## セットアップ（CDN）
 
 ```html
-<script type="text/javascript" src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script type="text/javascript" src="https://cdn.geolonia.com/embed/v6/embed?geolonia-api-key=YOUR-API-KEY"></script>
 ```
 
 - API キーは Geolonia のタイル・スタイルを使う場合に必要
-- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する場合は、有効な API キーは要らない（外部の style.json でも Geolonia のタイルを参照していればキーが要る）。ただし URL の `geolonia-api-key` パラメータ自体は省けない（無いと `Cannot load API key.` で止まる）ので、値は `YOUR-API-KEY` のままでよい
+- Geolonia のスタイルもタイルも参照しない外部の style.json を指定する場合は、有効な API キーは要らない（外部の style.json でも Geolonia のタイルを参照していればキーが要る）。ただし URL の `geolonia-api-key` パラメータは残す（値は `YOUR-API-KEY` のままでよい）。URL にも要素の `data-key` にもキーが無いと、通常のページでは表示されるが、embed v6.0.0 では別オリジンの iframe の中で `class="geolonia"` の地図が描画されなくなる（`new geolonia.Map()` で作る地図は影響を受けない）
+- `embed/v6` は MapLibre GL JS v6 系を同梱し、その worker を `blob:` URL から起動する。Content-Security-Policy を設定しているページでは `worker-src blob:` を許可する
 - `</body>` の直前に配置する
-- 旧形式 `https://cdn.geolonia.com/v1/embed?...` はレガシー互換。新規実装では `embed/v5/embed` を使う
+- 新規実装では `embed/v6/embed` を使う。`embed/v5/embed`（MapLibre GL JS v5 系を同梱）と旧形式の `v1/embed` は旧版で、配信は続いているが新しく書くコードでは使わない
 
 ## 基本原則
 

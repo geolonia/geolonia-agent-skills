@@ -34,7 +34,7 @@ skills/
   `geolonia-google-maps-migration` は `@geolonia/maps-suite` の npm パッケージ利用が前提
   （Google Maps からの移行元コードが npm ベースであることが多いため）。
   `geolonia-mapbox-migration` も同じ理由で `@geolonia/maps-core` の npm パッケージ利用を本線にし、
-  script タグで読み込んでいるコードには CDN の `embed/v5` を案内する
+  script タグで読み込んでいるコードには CDN の `embed/v6` を案内する
 - SKILL.md は軽量に保ち、詳細は参照ファイルに分離する
 - Geolonia Maps は MapLibre GL JS の拡張であることを前提とする
 - `@geolonia/maps-suite` の既知の未実装機能・互換性バグはライブラリ側の課題管理で追跡し、

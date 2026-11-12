@@ -34,11 +34,27 @@ map.on('moveend', () => { console.log(map.getCenter()); });
 map.on('zoomend', () => { console.log(map.getZoom()); });
 ```
 
-### ブラウザサポート確認
+### 地図を表示できない環境
+
+WebGL が使えないなどで地図の描画を初期化できないと、地図のコンテナに原因と利用者が試せる手順を示す案内が自動で表示される（`geolonia.supported()` のような判定用の関数は無い）。`new geolonia.Map()` で作る地図では、文言を `errorMessage` オプションで変えられ（`class="geolonia"` の地図には対応する `data-*` 属性が無い）、`false`（または `'off'`）にすると何も表示しない。案内を表示したうえでコンストラクタは例外を投げるので、地図の後に続く処理を止めたくない場合は `try` / `catch` で囲む。
 
 ```javascript
-if (!geolonia.supported()) {
-  alert('このブラウザは対応していません');
+let map;
+try {
+  map = new geolonia.Map({
+    container: 'map',
+    errorMessage: '地図を表示できませんでした。別のブラウザでお試しください。', // HTML ではなく文字列として表示される
+  });
+} catch (e) {
+  // WebGL を初期化できなかった場合は、案内がコンテナに表示済み。
+  // コンテナが見つからない、API キーが無いのに Geolonia のスタイルを指定した、などの場合は案内は出ないので、ログに残す
+  console.error(e);
+}
+
+if (map) {
+  map.on('load', () => {
+    // 地図に依存する処理
+  });
 }
 ```
 
@@ -158,6 +174,6 @@ window.geolonia.registerPlugin(myPlugin);
 プラグインスクリプトは Embed API のスクリプトより後に読み込む:
 
 ```html
-<script src="https://cdn.geolonia.com/embed/v5/embed?geolonia-api-key=YOUR-API-KEY"></script>
+<script src="https://cdn.geolonia.com/embed/v6/embed?geolonia-api-key=YOUR-API-KEY"></script>
 <script src="my-plugin.js"></script>
 ```

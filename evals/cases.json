@@ -5,9 +5,9 @@
       "id": "explicit-cdn",
       "type": "Explicit",
       "prompt": "Geolonia Maps を使って、東京タワー（緯度35.6586, 経度139.7454）にマーカーを置いた地図を表示する HTML を、CDN 埋め込みで書いてください。",
-      "has": ["cdn.geolonia.com/embed/v5/embed"],
+      "has": ["cdn.geolonia.com/embed/v6/embed"],
       "hasAny": ["class=\"geolonia\"", "geolonia.Map", "geolonia.Marker"],
-      "notHas": ["v1/embed"]
+      "notHas": ["cdn.geolonia.com/v1/embed", "cdn.geolonia.com/embed/v5/"]
     },
     {
       "id": "antipattern-default-style",

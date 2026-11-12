@@ -1,6 +1,6 @@
 # Mapbox 固有の機能と、その代わりに使うもの
 
-記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v5`（MapLibre GL JS v5.19.0）の時点。ここに「無い」と書いた API でも、新しい版で入っていることがある。代替を書く前に、インストール済みの `maplibre-gl` の型定義をその名前で検索する。
+記述は `@geolonia/maps-core` v0.8.0（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0）の時点。ここに「無い」と書いた API でも、新しい版で入っていることがある。代替を書く前に、インストール済みの `maplibre-gl` の型定義をその名前で検索する。
 
 Mapbox の名前で見つからない API を「MapLibre の版が古いせい」と考えて版を上げても、ほとんどの場合は解決しない。分岐後に別々に作られた機能は、MapLibre では別の名前になっている。
 

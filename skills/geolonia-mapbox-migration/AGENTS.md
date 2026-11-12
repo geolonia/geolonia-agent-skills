@@ -1,6 +1,6 @@
 # Geolonia Mapbox 移行 クイックリファレンス（エージェント向け）
 
-`SKILL.md` の凝縮版。記述は `@geolonia/maps-core` **v0.8.0**（`maplibre-gl` v6 系）と CDN の `embed/v5`（MapLibre GL JS v5.19.0）の時点。詳細は同ディレクトリの `references/` を参照する。
+`SKILL.md` の凝縮版。記述は `@geolonia/maps-core` **v0.8.0**（`maplibre-gl` v6 系）と CDN の `embed/v6`（`@geolonia/embed` v6.0.0、MapLibre GL JS v6.16.0）の時点。詳細は同ディレクトリの `references/` を参照する。
 
 インストール済みの版がここより新しい場合は、この文書ではなく `node_modules/@geolonia/maps-core/dist/npm/index.d.ts` と `node_modules/maplibre-gl/dist/maplibre-gl.d.ts` を正とする。
 
@@ -8,8 +8,8 @@
 
 - MapLibre GL JS は Mapbox GL JS v1.13 から分岐した。v1 時代からある API（`Map`、`Marker`、`Popup`、`addSource`、`addLayer`、イベント、式）は名前空間の置き換えだけで動く。
 - npm の `mapbox-gl` は `@geolonia/maps-core` に移す（`npm install @geolonia/maps-core maplibre-gl`）。`GeoloniaMap` は `maplibregl.Map` を継承している。ESM 専用。
-- script タグの Mapbox GL JS は CDN の `embed/v5` に移す（`geolonia.Map`）。こちらは MapLibre GL JS v5.19.0 で、worker の設定は要らない。
-- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルかタイルを使うときだけ `apiKey` を渡す（外部の style.json でも Geolonia のタイルを参照していれば要る）。CDN の URL の `geolonia-api-key` は外部スタイルだけを使う場合も省けない（値はプレースホルダーでよい）。
+- script タグの Mapbox GL JS は CDN の `embed/v6` に移す（`geolonia.Map`）。こちらも MapLibre GL JS v6 系で、worker は同梱されているので設定は要らない（CSP では `worker-src blob:` を許可する）。
+- `mapboxgl.accessToken` は消す。npm 版では Geolonia のスタイルかタイルを使うときだけ `apiKey` を渡す（外部の style.json でも Geolonia のタイルを参照していれば要る）。CDN では URL の `geolonia-api-key` で渡す（外部スタイルだけでもパラメータは残す。値は `YOUR-API-KEY` でよい）。
 
 ## 対応表（詳細は references/）
 
@@ -40,6 +40,6 @@
 - `geoloniaControl: false` でロゴが消えると考えない（v0.8.0 では位置だけ変えられる）。
 - `mapbox://` の URL を残さない（例外は出ず、地図が表示されないだけになる）。Mapbox Studio のスタイルを書き出しただけで使えると考えない（タイルのスキーマが違う）。
 - `setFog`、`setConfigProperty`、`addImport`、`slot`、`type: 'model'` を MapLibre の版を上げれば使えると考えない。名前が違うか、対応するものが無い。
-- CDN の `embed/v5` で MapLibre v6 の API を使わない（v5.19.0 が同梱されている）。CDN の URL から `geolonia-api-key` を省かない（外部スタイルだけでも必要）。
+- 旧版の CDN `embed/v5`（MapLibre GL JS v5 系）に移さない。新しく書くコードは `embed/v6` を使う。
 - MapLibre の API を Geolonia 用に書き換えようとしない。`GeoloniaMap` は `maplibregl.Map` そのもののメソッドとイベントを持つ。
 - API キーを公開リポジトリやコミットに直書きしない。
